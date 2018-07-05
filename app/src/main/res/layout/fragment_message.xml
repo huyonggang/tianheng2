@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+
+
+    <LinearLayout
+        android:id="@+id/user_detail"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:background="@drawable/bg_battery"
+        android:layout_marginTop="128dp"
+        android:layout_marginLeft="72dp"
+        android:layout_marginRight="72dp"
+        android:padding="72dp"
+        android:gravity="center_vertical"
+        android:visibility="gone">
+
+
+        <ImageView
+            android:id="@+id/avatar"
+            android:layout_width="72dp"
+            android:layout_height="72dp" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:layout_marginLeft="36dp">
+
+            <TextView
+                android:id="@+id/name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="20sp"
+                android:text="张三"
+                />
+
+            <TextView
+                android:id="@+id/wallet"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="20sp"
+                android:text="181"
+                android:layout_marginTop="10dp"
+                />
+        </LinearLayout>
+
+        <com.rey.material.widget.Button
+            android:id="@+id/login_out"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="退出"
+            android:layout_marginRight="36dp"/>
+
+    </LinearLayout>
+    
+
+    <com.rey.material.widget.Button
+        android:id="@+id/control"
+        android:layout_width="match_parent"
+        android:layout_height="72dp"
+        android:text="更换电池"
+        android:gravity="center"
+        android:layout_margin="128dp"
+        android:textColor="@color/_FFFFFF"
+        android:background="@color/colorPrimary"
+        />
+
+
+
+    <com.rey.material.widget.TextView
+        android:id="@+id/message"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="24dp"
+        android:gravity="center"
+        android:textSize="20sp"
+        />
+
+</LinearLayout>

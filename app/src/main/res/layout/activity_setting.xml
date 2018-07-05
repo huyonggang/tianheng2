@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical">
+
+
+    <include layout="@layout/include_toolbar"/>
+
+
+
+    <LinearLayout
+        android:id="@+id/maintain"
+        android:layout_width="match_parent"
+        android:layout_height="128dp"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"/>
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="match_parent"
+            android:gravity="center_vertical"
+            android:text="维护"
+            android:layout_marginLeft="64dp"
+            android:textSize="40sp"
+            />
+    </LinearLayout>
+    
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/_979797"/>
+
+
+    <LinearLayout
+        android:id="@+id/version"
+        android:layout_width="match_parent"
+        android:layout_height="128dp"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginLeft="64dp"/>
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="match_parent"
+            android:gravity="center_vertical"
+            android:textSize="40sp"
+            android:text="版本升级"
+            />
+    </LinearLayout>
+
+
+    <com.rey.material.widget.Button
+        android:id="@+id/login_out"
+        android:layout_width="match_parent"
+        android:layout_height="72dp"
+        android:text="退出登录"
+        android:layout_marginTop="120dp"
+        android:layout_marginLeft="64dp"
+        android:layout_marginRight="64dp"
+        android:textSize="40sp"
+        android:textColor="@color/_FFFFFF"
+        android:background="@color/colorPrimary"
+        />
+
+</LinearLayout>
