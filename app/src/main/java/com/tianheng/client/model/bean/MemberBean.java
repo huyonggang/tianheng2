@@ -38,6 +38,15 @@ public class MemberBean {
     private boolean payWallet;
     private boolean networkActive;
     private String ticket;
+    private float tradeMoney;
+
+    public float getTradeMoney() {
+        return tradeMoney;
+    }
+
+    public void setTradeMoney(float tradeMoney) {
+        this.tradeMoney = tradeMoney;
+    }
 
     public String getTicket() {
         return ticket;

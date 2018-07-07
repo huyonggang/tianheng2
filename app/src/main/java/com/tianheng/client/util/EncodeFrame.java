@@ -6,7 +6,7 @@ package com.tianheng.client.util;
 
 public class EncodeFrame {
 
-    public static byte[] selectFirst(String deviceNo) {
+    public static byte[] selectFirst(int deviceNo) {
         StringBuilder builder = new StringBuilder();
         builder.append("1801");
         builder.append(getDeviceNo(deviceNo));
@@ -14,20 +14,11 @@ public class EncodeFrame {
         return DataUtils.HexString2Bytes(builder.toString());
     }
 
-    public static String getDeviceNo(String deviceNo) {
-        int length = deviceNo.length();
-        if (length == 1) {
-            return "000" + deviceNo;
-        } else if (length == 2) {
-            return "00" + deviceNo;
-        } else if (length == 3) {
-            return "0" + deviceNo;
-        } else {
-            return deviceNo;
-        }
+    public static String getDeviceNo(int deviceNo) {
+        return "000"+deviceNo;
     }
 
-    public static byte[] selectByPageNo(String deviceNo, String pageNo) {
+    public static byte[] selectByPageNo(int deviceNo, String pageNo) {
         StringBuilder builder = new StringBuilder();
         builder.append("1806E5F4");
         builder.append("FFFFFFFF00");
@@ -40,12 +31,12 @@ public class EncodeFrame {
     }
 
 
-    public static byte[] selectEnd(String deviceNo) {
+    public static byte[] selectEnd(int deviceNo) {
         return selectByPageNo(deviceNo, "FF");
     }
 
     //取电池 18 01 00 02 78 06 18 1E 06 46 00 01
-    public static byte[] takeOut(String deviceNo) {
+    public static byte[] takeOut(int deviceNo) {
         StringBuilder builder = new StringBuilder();
         builder.append("1801");
         builder.append(getDeviceNo(deviceNo));
@@ -54,7 +45,7 @@ public class EncodeFrame {
     }
 
     //放电池 18 01 00 02 78 06 18 1E 08 44 00 01
-    public static byte[] putIn(String deviceNo) {
+    public static byte[] putIn(int deviceNo) {
         StringBuilder builder = new StringBuilder();
         builder.append("1801");
         builder.append(getDeviceNo(deviceNo));

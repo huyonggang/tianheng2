@@ -8,6 +8,7 @@ import com.tianheng.client.base.BaseFragment;
 import com.tianheng.client.broad.CabinetManager;
 import com.tianheng.client.model.bean.BatteryBean;
 import com.tianheng.client.model.event.DoorsStatusEvent;
+import com.tianheng.client.model.event.GoodsStatusEvent;
 import com.tianheng.client.model.frame.BMSFrame;
 import com.tianheng.client.model.frame.BatteryFrame;
 import com.tianheng.client.presenter.BatteryPresenter;
@@ -17,6 +18,7 @@ import com.tianheng.client.util.ToastUtil;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -56,14 +58,20 @@ public class BatteryFragment extends BaseFragment<BatteryPresenter> implements B
 
     private void initData() {
         mCabinetManager = new CabinetManager(getActivity());
-        mCabinetManager.getDoorsStatus(0, 7);
-        for (int i = 0; i <8; i++) {
+        mCabinetManager.getDoorsStatus(0, 8);
+        for (int i = 0; i < 8; i++) {
             BatteryBean batteryBean = new BatteryBean();
             batteryBean.setNum(i);
-//            batteryBean.setStatus(opends.get(i));
             batteryBeans.add(batteryBean);
             mAdapter.setList(batteryBeans);
         }
+    }
+
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        mAdapter.setList(batteryBeans);
     }
 
     private void initView() {
@@ -85,30 +93,54 @@ public class BatteryFragment extends BaseFragment<BatteryPresenter> implements B
 
     @Subscribe
     public void onEvent(DoorsStatusEvent event) {
-//        batteryBeans.clear();
-//        List<Integer> opends = event.opendArray;
-    }
-
-    @Subscribe
-    public void onEvent(BatteryFrame batteryFrame) {
-        if (batteryFrame != null) {
-            BatteryBean batteryBean = new BatteryBean();
-            batteryBean.setNum(5);
-            batteryBean.setElectricity(Integer.parseInt(batteryFrame.electric,16));
-            mAdapter.setBatteryBean(batteryBean);
+        List<Integer> opendArray = event.opendArray;
+        if (opendArray != null && opendArray.size() > 0) {
+            for (int i = 0; i < opendArray.size(); i++) {
+                if (opendArray.get(i) == 1) {
+                    ToastUtil.showShort(mContext, "请关闭" + (i + 1) + "号箱门");
+                }
+            }
         }
     }
 
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onEvent(BatteryFrame batteryFrame){
+        if (Integer.parseInt(batteryFrame.bms)==1){
+            batteryBeans.get(Integer.parseInt(batteryFrame.device)).setStatus(2);
+        }
+        mAdapter.setList(batteryBeans);
+    }
 
     @Subscribe
-    public void onEvent(BMSFrame bmsFrame){
+    public void onEvent(GoodsStatusEvent goodsStatusEvent) {
+        List<Integer> goodsList = goodsStatusEvent.goodsList;
+        if (goodsList != null && goodsList.size() > 0) {
+            for (int i = 0; i < goodsList.size(); i++) {
+                if (goodsList.get(i) == 0) {
+                    batteryBeans.get(i).setStatus(2);
+                }
+            }
+        }
+        mAdapter.setList(batteryBeans);
+    }
+
+
+    @Subscribe
+    public void onEvent(BMSFrame bmsFrame) {
         if (bmsFrame != null) {
             BatteryBean batteryBean = new BatteryBean();
-            batteryBean.setNum(5);
+            String status = bmsFrame.status;
+            if ("0000".equals(status)){
+                batteryBean.setStatus(0);
+            }else if ("0001".equals(status)){
+                batteryBean.setStatus(1);
+            }
+            batteryBean.setNum(bmsFrame.pageNo);
             batteryBean.setElectricity(getPower(bmsFrame));
             mAdapter.setBatteryBean(batteryBean);
         }
     }
+
     public int getPower(BMSFrame bmsFrame) {
         float capacity = Integer.parseInt(bmsFrame.capacity, 16);
         float capacitySum = Integer.parseInt(bmsFrame.capacitySum, 16);
@@ -118,14 +150,14 @@ public class BatteryFragment extends BaseFragment<BatteryPresenter> implements B
 
     @Override
     public void showContent(String message) {
-        ToastUtil.showShort(getActivity(),message);
+        ToastUtil.showShort(getActivity(), message);
     }
 
 
     @Override
     public void onStart() {
         super.onStart();
-        if (!EventBus.getDefault().isRegistered(this)){
+        if (!EventBus.getDefault().isRegistered(this)) {
             EventBus.getDefault().register(this);
         }
     }
@@ -134,7 +166,7 @@ public class BatteryFragment extends BaseFragment<BatteryPresenter> implements B
     @Override
     public void onStop() {
         super.onStop();
-        if (EventBus.getDefault().isRegistered(this)){
+        if (EventBus.getDefault().isRegistered(this)) {
             EventBus.getDefault().unregister(this);
         }
     }

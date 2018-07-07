@@ -21,7 +21,7 @@
             android:layout_gravity="center"
             android:background="@color/colorPrimary"
             android:gravity="center"
-            android:text="电量:20%" />
+             />
 
 
         <com.tianheng.client.wedget.BatteryView
@@ -32,14 +32,5 @@
             />
 
     </LinearLayout>
-
-    <com.rey.material.widget.Button
-        android:id="@+id/open_box"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="打开"
-        android:layout_marginLeft="20dp"
-        android:background="@drawable/bg_battery"
-        android:layout_gravity="center_vertical"/>
 
 </LinearLayout>

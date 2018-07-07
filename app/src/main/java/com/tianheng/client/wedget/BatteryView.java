@@ -95,6 +95,7 @@ public class BatteryView extends View {
         /**
          * 设置电量矩形
          */
+
         mPowerRect = new RectF(mBatteryStroke * 4, // 需要调整左边的位置
                 mPowerPadding + mBatteryStroke / 2, // 需要考虑到 画笔的宽度
                 mCapWidth + mBatteryStroke / 2 + mPowerPadding
@@ -133,7 +134,7 @@ public class BatteryView extends View {
         }
         mPowerRect = new RectF(mBatteryStroke * 4, // 需要调整左边的位置
                 mPowerPadding + mBatteryStroke / 2, // 需要考虑到 画笔的宽度
-                mCapWidth + mBatteryStroke / 2 + mPowerPadding
+                mCapWidth + mBatteryStroke / 2 - mPowerPadding-mBatteryStroke*2
                         + mPowerWidth * (mPower / 100f), mBatteryStroke / 2
                 + mPowerPadding + mPowerHeight);
         invalidate();

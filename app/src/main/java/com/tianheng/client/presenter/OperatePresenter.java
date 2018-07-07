@@ -5,6 +5,8 @@ import android.text.TextUtils;
 import com.tianheng.client.base.RxPresenter;
 import com.tianheng.client.manage.TTSManage;
 import com.tianheng.client.model.bean.ExchangeBean;
+import com.tianheng.client.model.bean.MemberBean;
+import com.tianheng.client.model.bean.OrderBean;
 import com.tianheng.client.model.http.ApiFactory;
 import com.tianheng.client.model.http.BaseHttpResponse;
 import com.tianheng.client.model.http.HttpResponse;
@@ -63,6 +65,8 @@ public class OperatePresenter extends RxPresenter<OperateContract.View> implemen
                     public void accept(BaseHttpResponse baseHttpResponse) throws Exception {
                         if (baseHttpResponse.isSuccess()) {
                             mView.putOldSuccess();
+                        }else{
+                            mView.showContent(baseHttpResponse.getMessage());
                         }
 
                     }
@@ -83,7 +87,9 @@ public class OperatePresenter extends RxPresenter<OperateContract.View> implemen
                     @Override
                     public void accept(BaseHttpResponse baseHttpResponse) throws Exception {
                         if (baseHttpResponse.isSuccess()) {
-
+                            mView.closeNewSuccess();
+                        }else{
+                            mView.showContent(baseHttpResponse.getMessage());
                         }
 
                     }
@@ -128,6 +134,8 @@ public class OperatePresenter extends RxPresenter<OperateContract.View> implemen
                     @Override
                     public void accept(BaseHttpResponse baseHttpResponse) throws Exception {
                         if (baseHttpResponse.isSuccess()) {
+                        }else{
+                            mView.showContent(baseHttpResponse.getMessage());
                         }
 
                     }
@@ -149,10 +157,13 @@ public class OperatePresenter extends RxPresenter<OperateContract.View> implemen
     public void closeOld(int contain, String leaseBatteryNumber, int emptyBoxNumber, int exchangeBoxNumber, String exchangeBatteryNumber) {
         Disposable disposable = mApiFactory.getOperateApi().closeOld(contain, leaseBatteryNumber, emptyBoxNumber, exchangeBoxNumber, exchangeBatteryNumber)
                 .compose(RxSchedulers.io_main())
-                .subscribe(new Consumer<BaseHttpResponse>() {
+                .subscribe(new Consumer<HttpResponse<OrderBean>>() {
                     @Override
-                    public void accept(BaseHttpResponse baseHttpResponse) throws Exception {
-                        if (baseHttpResponse.isSuccess()) {
+                    public void accept(HttpResponse<OrderBean> response) throws Exception {
+                        if (response.isSuccess()) {
+                            mView.closeOldSuccess(response.getData());
+                        }else{
+                            mView.showContent(response.getMessage());
                         }
 
                     }
@@ -173,6 +184,9 @@ public class OperatePresenter extends RxPresenter<OperateContract.View> implemen
                     @Override
                     public void accept(BaseHttpResponse baseHttpResponse) throws Exception {
                         if (baseHttpResponse.isSuccess()) {
+                            mView.takeoutNewSuccess();
+                        }else{
+                            mView.showContent(baseHttpResponse.getMessage());
                         }
 
                     }
@@ -193,6 +207,8 @@ public class OperatePresenter extends RxPresenter<OperateContract.View> implemen
                     @Override
                     public void accept(BaseHttpResponse baseHttpResponse) throws Exception {
                         if (baseHttpResponse.isSuccess()) {
+                        }else{
+                            mView.showContent(baseHttpResponse.getMessage());
                         }
 
                     }
@@ -203,6 +219,30 @@ public class OperatePresenter extends RxPresenter<OperateContract.View> implemen
                     }
                 });
         addDispose(disposable);
+    }
+
+    @Override
+    public void getMemberDetail() {
+        Disposable disposable = mApiFactory.getOperateApi().getMemberDetail()
+                .compose(RxSchedulers.io_main())
+                .subscribe(new Consumer<HttpResponse<MemberBean>>() {
+                    @Override
+                    public void accept(HttpResponse<MemberBean> response) throws Exception {
+                        if (response.isSuccess()) {
+                            mView.showMemberDetail(response.getData());
+                        }else{
+                            mView.showContent(response.getMessage());
+                        }
+
+                    }
+                }, new Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable throwable) throws Exception {
+                        mView.showContent(throwable.getMessage());
+                    }
+                });
+        addDispose(disposable);
+
     }
 
 

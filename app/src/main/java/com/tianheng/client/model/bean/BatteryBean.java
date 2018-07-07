@@ -2,6 +2,12 @@ package com.tianheng.client.model.bean;
 
 /**
  * Created by huyg on 2018/1/20.
+ * status
+ * 0 :充电中
+ * 1：充满
+ *
+ * 2:空箱
+ * 3：故障
  */
 
 public class BatteryBean {

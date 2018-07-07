@@ -63,6 +63,28 @@ public class CabinetManager {
         mIntent.putExtra(BOXESCOUNTS,iBoxesCounts);
         sendBroadcast();
     }
+    /**
+     * 获取指定副机所在门的物品状态
+     * @param iBoardId
+     * @param lookId
+     */
+//    public void getGoodStatus(int iBoardId,int lookId){
+//        mIntent.setAction(Const.REQ_GOODS_STATUS);
+//        mIntent.putExtra(BOARD_ID,iBoardId);
+//        mIntent.putExtra(LOCK_ID,lookId);
+//        sendBroadcast();
+//    }
+
+    /**
+     * 获取指定副机所有门的物品状态
+     * @param iBoardId
+     */
+//    public void getGoodsStatus(int iBoardId){
+//        mIntent.setAction(Const.REQ_GOODSES_STATUS);
+//        mIntent.putExtra(BOARD_ID,iBoardId);
+//        mIntent.putExtra(BOXESCOUNTS,8);
+//        sendBroadcast();
+//    }
 
 
 

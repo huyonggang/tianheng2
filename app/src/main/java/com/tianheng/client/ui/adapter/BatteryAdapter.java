@@ -38,8 +38,8 @@ public class BatteryAdapter extends RecyclerView.Adapter<BatteryAdapter.ViewHold
 
     }
 
-    public void setBatteryBean(BatteryBean batteryBean1){
-        mList.set(5,batteryBean1);
+    public void setBatteryBean(BatteryBean batteryBean) {
+        mList.set(batteryBean.getNum(), batteryBean);
         notifyDataSetChanged();
     }
 
@@ -49,7 +49,6 @@ public class BatteryAdapter extends RecyclerView.Adapter<BatteryAdapter.ViewHold
             notifyDataSetChanged();
         }
     }
-
 
 
     public boolean isTesting() {
@@ -70,13 +69,19 @@ public class BatteryAdapter extends RecyclerView.Adapter<BatteryAdapter.ViewHold
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
         BatteryBean batteryBean = mList.get(position);
-        holder.mBattery.setPower(batteryBean.getElectricity());
-        holder.mElectricity.setText("电量" + batteryBean.getElectricity() + "%");
-        if (isTesting && batteryBean.getStatus() == 0) {
-            holder.mOpenBox.setVisibility(View.VISIBLE);
-        } else {
-            holder.mOpenBox.setVisibility(View.GONE);
+
+        if (batteryBean.getStatus() == 0) {
+            holder.mElectricity.setText("电量" + batteryBean.getElectricity() + "%");
+            holder.mBattery.setPower(batteryBean.getElectricity());
+        } else if (batteryBean.getStatus()==1){
+            holder.mElectricity.setText("已充满");
+            holder.mBattery.setPower(100);
         }
+        else if (batteryBean.getStatus() == 2) {
+            holder.mElectricity.setText("无电池");
+            holder.mBattery.setPower(0);
+        }
+
     }
 
 
@@ -90,14 +95,6 @@ public class BatteryAdapter extends RecyclerView.Adapter<BatteryAdapter.ViewHold
         TextView mElectricity;
         @BindView(R.id.item_battery)
         BatteryView mBattery;
-        @BindView(R.id.open_box)
-        Button mOpenBox;
-
-        @OnClick(R.id.open_box)
-        public void onClick() {
-            int position = getLayoutPosition();
-            EventBus.getDefault().post(new OpenDoorNumEvent(position));
-        }
 
 
         public ViewHolder(View itemView) {

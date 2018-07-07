@@ -19,7 +19,7 @@ public class SerialPortUtil {
     private OutputStream mOutputStream;
     private InputStream mInputStream;
     private ReadThread mReadThread;
-    private String path = "/dev/ttyS1";
+    private String path = "/dev/ttyS2";
     private int baudrate = 9600;
     private static SerialPortUtil portUtil;
     private boolean isStop = false;

@@ -100,6 +100,7 @@ public class SerialPortService extends Service implements SerialPortUtil.OnDataR
         @Override
         public void handleMessage(Message msg) {
             String realFrame = (String) msg.obj;
+            Log.d(TAG,"realFrame--->"+realFrame);
             if (Const.FRAME_80.equals(realFrame.substring(8, 10))) {
                 batteryFrame.head = realFrame.substring(0, 4);
                 batteryFrame.device = realFrame.substring(4, 8);

@@ -17,6 +17,7 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.Toolbar;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -31,6 +32,7 @@ import android.widget.TextView;
 import com.tianheng.client.App;
 import com.tianheng.client.R;
 import com.tianheng.client.base.BaseActivity;
+import com.tianheng.client.broad.CabinetManager;
 import com.tianheng.client.model.event.DoorErrorEvent;
 import com.tianheng.client.model.frame.BMSFrame;
 import com.tianheng.client.presenter.HomePresenter;
@@ -39,6 +41,7 @@ import com.tianheng.client.service.SClientService;
 import com.tianheng.client.service.SerialPortService;
 import com.tianheng.client.ui.fragment.BatteryFragment;
 import com.tianheng.client.ui.fragment.OperateFragment;
+import com.tianheng.client.util.DataUtils;
 import com.tianheng.client.util.GlideImageLoader;
 import com.tianheng.client.util.ToastUtil;
 import com.youth.banner.Banner;
@@ -52,6 +55,7 @@ import java.util.List;
 import butterknife.BindView;
 import cn.jpush.android.api.JPushInterface;
 import cn.pedant.SweetAlert.SweetAlertDialog;
+import io.netty.handler.codec.base64.Base64;
 
 /**
  * Created by huyg on 2017/12/25.
@@ -83,7 +87,7 @@ public class HomeActivity extends BaseActivity<HomePresenter> implements HomeCon
     private SerialPortService mPortService;
     private SClientService mClientService;
     private SweetAlertDialog mDialog;
-
+    private CabinetManager mCabinetManager;
 
     @Override
     protected void initInject() {
@@ -97,12 +101,15 @@ public class HomeActivity extends BaseActivity<HomePresenter> implements HomeCon
 
     @Override
     protected void init() {
-        //hideBottomUIMenu();
-
         mHander.sendEmptyMessageAtTime(0, 10 * 1000);
         initService();
         initData();
         initView();
+        initCabinetManager();
+    }
+
+    private void initCabinetManager() {
+        mCabinetManager = new CabinetManager(this);
     }
 
     private void initData() {
@@ -198,6 +205,7 @@ public class HomeActivity extends BaseActivity<HomePresenter> implements HomeCon
             @Override
             public void OnBannerClick(int position) {
                 mBanner.setVisibility(View.GONE);
+                mCabinetManager.getDoorsStatus(0,8);
             }
         });
     }
@@ -227,13 +235,14 @@ public class HomeActivity extends BaseActivity<HomePresenter> implements HomeCon
 
         mToolbar.addView(mSubView);
         mToolbar.addView(mTitleView);
-        mSubView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(HomeActivity.this, SettingActivity.class);
-                startActivity(intent);
-            }
-        });
+//        mSubView.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                Intent intent = new Intent(HomeActivity.this, SettingActivity.class);
+//                startActivity(intent);
+//            }
+//        });
+        mSubView.setVisibility(View.GONE);
         mToolbar.setTitle("");
         setSupportActionBar(mToolbar);
 
@@ -272,11 +281,12 @@ public class HomeActivity extends BaseActivity<HomePresenter> implements HomeCon
 
     @Override
     public void closeDialog() {
-        mDialog.cancel();
+        mDialog.dismiss();
     }
 
     @Override
     public void sendFrame(byte[] frame) {
+        Log.d("HomeActivity","sendFrame--->"+ DataUtils.bytes2HexString(frame,frame.length));
         mPortService.sendData(frame);
     }
 

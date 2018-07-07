@@ -79,7 +79,7 @@ public class SClientService extends Service {
         batteryInfo.setBoxNumber(bmsFrame.pageNo);
         batteryInfo.setCurPower(getPower(bmsFrame));
         batteryInfo.setCurVoltage(sumVol(bmsFrame));
-        //batteryInfo.setChargerStatus(resolveStatus(bmsFrame));
+        batteryInfo.setChargerStatus(resolveStatus(bmsFrame));
         Log.d(tag, new Gson().toJson(batteryInfo));
         String frame = new Gson().toJson(batteryInfo);
         SClientManager.getInstance().sendFrame(frame);
@@ -103,30 +103,42 @@ public class SClientService extends Service {
 
 
     public int resolveStatus(BMSFrame bmsFrame) {
-        int status = 0;
-        byte[] bytes = new byte[32];
-        bytes = DataUtils.hexStringToByteArray(bmsFrame.status);
-        if (bytes[2] == 1) {
-            sendErrorFrame("充电过流");
-        } else if (bytes[3] == 1) {
-            sendErrorFrame("电芯过压");
-        } else if (bytes[5] == 1) {
-            sendErrorFrame("短路");
-        } else if (bytes[6] == 1) {
-            sendErrorFrame("放电过流");
-        } else if (bytes[7] == 1) {
-            sendErrorFrame("电芯欠压");
-        } else if (bytes[8] == 1) {
-            sendErrorFrame("电芯侦测线开路");
-        } else if (bytes[9] == 1) {
-            sendErrorFrame("温感侦测线开路");
-        } else if (bytes[10] == 1) {
-            sendErrorFrame("电芯温度过高");
-        } else if (bytes[11] == 1) {
-            sendErrorFrame("电芯温度过低");
+        int status ;
+        String statusStr = bmsFrame.status;
+        if ("0000".equals(statusStr)) {
+            status = 1;
+        } else if ("0001".equals(statusStr)) {
+            status = 0;
+        } else {
+            status = 3;
         }
         return status;
     }
+
+//    public int resolveStatus(BMSFrame bmsFrame) {
+//        int status = 0;
+//        String  statusStr = bmsFrame.status;
+//        if ("0000".equals(statusStr)) {
+//            status = 1;
+//        } else if ("0001".equals(statusStr)) {
+//            status = 0;
+//        } else if (bytes[5] == 1) {
+//            sendErrorFrame("短路");
+//        } else if (bytes[6] == 1) {
+//            sendErrorFrame("放电过流");
+//        } else if (bytes[7] == 1) {
+//            sendErrorFrame("电芯欠压");
+//        } else if (bytes[8] == 1) {
+//            sendErrorFrame("电芯侦测线开路");
+//        } else if (bytes[9] == 1) {
+//            sendErrorFrame("温感侦测线开路");
+//        } else if (bytes[10] == 1) {
+//            sendErrorFrame("电芯温度过高");
+//        } else if (bytes[11] == 1) {
+//            sendErrorFrame("电芯温度过低");
+//        }
+//        return status;
+//    }
 
     public double sumVol(BMSFrame bmsFrame) {
         double sum = 0;
