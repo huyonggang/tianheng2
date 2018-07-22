@@ -44,10 +44,6 @@ public class SettingActivity extends BaseActivity<SettingPresenter> implements S
                 startActivity(mIntent);
                 finish();
                 break;
-            case R.id.maintain:
-                mIntent.setClass(SettingActivity.this, TestActivity.class);
-                startActivity(mIntent);
-                break;
             case R.id.version:
                 break;
         }

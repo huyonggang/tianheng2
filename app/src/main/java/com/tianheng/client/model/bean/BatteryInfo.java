@@ -18,7 +18,7 @@ public class BatteryInfo {
     private String cabinetNumber; //电池柜编号
     private String batteryNumber;//电池编号
     private int boxNumber;//电池所在的箱子编号
-    private int curPower;//当前电量
+    private double curPower;//当前电量
     private double curVoltage;//当前电压
     private int chargerStatus;//充电状态0未使用1充电中2放电中
 
@@ -64,11 +64,11 @@ public class BatteryInfo {
         this.boxNumber = boxNumber;
     }
 
-    public int getCurPower() {
+    public double getCurPower() {
         return curPower;
     }
 
-    public void setCurPower(int curPower) {
+    public void setCurPower(double curPower) {
         this.curPower = curPower;
     }
 

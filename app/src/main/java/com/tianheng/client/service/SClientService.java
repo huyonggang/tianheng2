@@ -85,6 +85,20 @@ public class SClientService extends Service {
         SClientManager.getInstance().sendFrame(frame);
     }
 
+
+    public void sendEmptyBox(int boxNum){
+        BatteryInfo batteryInfo = new BatteryInfo();
+        batteryInfo.setType(1);
+        batteryInfo.setCabinetNumber(App.getInstance().getImei());
+        batteryInfo.setBatteryNumber("");
+        batteryInfo.setBoxNumber(boxNum);
+        batteryInfo.setCurPower(0);
+        batteryInfo.setCurVoltage(0);
+        batteryInfo.setChargerStatus(-1);
+        String frame = new Gson().toJson(batteryInfo);
+        SClientManager.getInstance().sendFrame(frame);
+    }
+
     public void sendErrorFrame(String content) {
         BatteryInfo batteryInfo = new BatteryInfo();
         batteryInfo.setType(3);

@@ -1,15 +1,15 @@
 package com.tianheng.client.model.event;
 
-import com.tianheng.client.model.bean.MemberBean;
+import com.tianheng.client.model.bean.UserMemberBean;
 
 /**
  * Created by huyg on 2018/3/17.
  */
 
 public class MemberEvent {
-    public MemberBean memberBean;
+    public UserMemberBean memberBean;
 
-    public MemberEvent(MemberBean memberBean) {
+    public MemberEvent(UserMemberBean memberBean) {
         this.memberBean = memberBean;
     }
 }

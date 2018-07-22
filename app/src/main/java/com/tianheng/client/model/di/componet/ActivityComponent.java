@@ -6,7 +6,6 @@ import com.tianheng.client.model.di.ActivityScope;
 import com.tianheng.client.model.di.module.ActivityModule;
 import com.tianheng.client.ui.activity.HomeActivity;
 import com.tianheng.client.ui.activity.SettingActivity;
-import com.tianheng.client.ui.activity.TestActivity;
 import com.tianheng.client.ui.activity.UserActivity;
 
 import dagger.Component;
@@ -24,7 +23,6 @@ public interface ActivityComponent {
     void inject(HomeActivity homeActivity);
     void inject(UserActivity userActivity);
     void inject(SettingActivity settingActivity);
-    void inject(TestActivity testActivity);
 
 
 }

@@ -7,6 +7,8 @@ import com.tianheng.client.manage.TTSManage;
 import com.tianheng.client.model.bean.ExchangeBean;
 import com.tianheng.client.model.bean.MemberBean;
 import com.tianheng.client.model.bean.OrderBean;
+import com.tianheng.client.model.bean.SubscribeBean;
+import com.tianheng.client.model.bean.UserBean;
 import com.tianheng.client.model.http.ApiFactory;
 import com.tianheng.client.model.http.BaseHttpResponse;
 import com.tianheng.client.model.http.HttpResponse;
@@ -43,45 +45,21 @@ public class OperatePresenter extends RxPresenter<OperateContract.View> implemen
         Disposable disposable = mApiFactory.getOperateApi().exchange()
                 .compose(RxSchedulers.io_main())
                 .compose(RxResult.handleResult())
-                .subscribe(new Consumer<ExchangeBean>() {
-                    @Override
-                    public void accept(ExchangeBean exchangeBean) throws Exception {
-                        if (exchangeBean != null) {
-                            mView.openDoor(exchangeBean);
-                        }
+                .subscribe(exchangeBean -> {
+                    if (exchangeBean != null) {
+                        mView.openDoor(exchangeBean);
                     }
                 }, new RxException<>(e -> {
+                    mView.closeDialog();
                     mView.showContent(e.getMessage());
                 }));
         addDispose(disposable);
     }
 
-    @Override
-    public void putInOld() {
-        Disposable disposable = mApiFactory.getOperateApi().putInOld()
-                .compose(RxSchedulers.io_main())
-                .subscribe(new Consumer<BaseHttpResponse>() {
-                    @Override
-                    public void accept(BaseHttpResponse baseHttpResponse) throws Exception {
-                        if (baseHttpResponse.isSuccess()) {
-                            mView.putOldSuccess();
-                        }else{
-                            mView.showContent(baseHttpResponse.getMessage());
-                        }
-
-                    }
-                }, new Consumer<Throwable>() {
-                    @Override
-                    public void accept(Throwable throwable) throws Exception {
-                        mView.showContent(throwable.getMessage());
-                    }
-                });
-        addDispose(disposable);
-    }
 
     @Override
-    public void closeNew(String oldOrderId) {
-        Disposable disposable = mApiFactory.getOperateApi().closeNew(oldOrderId)
+    public void closeNew(int exchangeBoxNumber,String exchangeBatteryNumber) {
+        Disposable disposable = mApiFactory.getOperateApi().closeNew(exchangeBoxNumber,exchangeBatteryNumber)
                 .compose(RxSchedulers.io_main())
                 .subscribe(new Consumer<BaseHttpResponse>() {
                     @Override
@@ -97,56 +75,13 @@ public class OperatePresenter extends RxPresenter<OperateContract.View> implemen
                     @Override
                     public void accept(Throwable throwable) throws Exception {
                         mView.showContent(throwable.getMessage());
+                        mView.closeDialog();
                     }
                 });
         addDispose(disposable);
     }
 
-    @Override
-    public void loginOut(String ticket) {
-        Disposable disposable = mApiFactory.getUserApi().logout(ticket)
-                .compose(RxSchedulers.io_main())
-                .subscribe(new Consumer<BaseHttpResponse>() {
-                    @Override
-                    public void accept(BaseHttpResponse baseHttpResponse) throws Exception {
-                        if (baseHttpResponse.isSuccess()) {
-                            mView.logoutSuccess();
-                        } else {
-                            mView.showContent(baseHttpResponse.getMessage());
-                        }
 
-
-                    }
-                }, new Consumer<Throwable>() {
-                    @Override
-                    public void accept(Throwable throwable) throws Exception {
-                        mView.showContent(throwable.getMessage());
-                    }
-                });
-        addDispose(disposable);
-    }
-
-    @Override
-    public void takeoutOld() {
-        Disposable disposable = mApiFactory.getOperateApi().takeoutOld()
-                .compose(RxSchedulers.io_main())
-                .subscribe(new Consumer<BaseHttpResponse>() {
-                    @Override
-                    public void accept(BaseHttpResponse baseHttpResponse) throws Exception {
-                        if (baseHttpResponse.isSuccess()) {
-                        }else{
-                            mView.showContent(baseHttpResponse.getMessage());
-                        }
-
-                    }
-                }, new Consumer<Throwable>() {
-                    @Override
-                    public void accept(Throwable throwable) throws Exception {
-                        mView.showContent(throwable.getMessage());
-                    }
-                });
-        addDispose(disposable);
-    }
 
     @Override
     public void speak(String content) {
@@ -154,8 +89,8 @@ public class OperatePresenter extends RxPresenter<OperateContract.View> implemen
     }
 
     @Override
-    public void closeOld(int contain, String leaseBatteryNumber, int emptyBoxNumber, int exchangeBoxNumber, String exchangeBatteryNumber) {
-        Disposable disposable = mApiFactory.getOperateApi().closeOld(contain, leaseBatteryNumber, emptyBoxNumber, exchangeBoxNumber, exchangeBatteryNumber)
+    public void closeOld( String leaseBatteryNumber, int emptyBoxNumber) {
+        Disposable disposable = mApiFactory.getOperateApi().closeOld(leaseBatteryNumber, emptyBoxNumber)
                 .compose(RxSchedulers.io_main())
                 .subscribe(new Consumer<HttpResponse<OrderBean>>() {
                     @Override
@@ -164,6 +99,7 @@ public class OperatePresenter extends RxPresenter<OperateContract.View> implemen
                             mView.closeOldSuccess(response.getData());
                         }else{
                             mView.showContent(response.getMessage());
+                            mView.closeDialog();
                         }
 
                     }
@@ -176,19 +112,81 @@ public class OperatePresenter extends RxPresenter<OperateContract.View> implemen
         addDispose(disposable);
     }
 
+
+
+
+
     @Override
-    public void takeoutNew(String oldOrderId) {
-        Disposable disposable = mApiFactory.getOperateApi().takeoutNew(oldOrderId)
+    public void getQRCode(String cabinetNumber, int imgWidth, int imgHeight, String imgType) {
+        Disposable disposable = mApiFactory.getUserApi().createQRCode("653101421454007",imgWidth,imgHeight,imgType)
+                .compose(RxSchedulers.io_main())
+                .subscribe(new Consumer<HttpResponse<String>>() {
+                    @Override
+                    public void accept(HttpResponse<String> response) throws Exception {
+                        if (response.isSuccess()){
+                            String url=response.getData();
+                            if (!TextUtils.isEmpty(url)){
+                                mView.showQRImg(url);
+                            }
+                        }
+
+                    }
+                }, new RxException<>(e -> {
+                    e.printStackTrace();
+                }
+                ));
+        addDispose(disposable);
+    }
+
+    @Override
+    public void login(String phone, String code) {
+        Disposable disposable = mApiFactory.getUserApi().login(phone,code, "653101421454007")
+                .compose(RxSchedulers.io_main())
+                .compose(RxResult.handleResult())
+                .subscribe(new Consumer<UserBean>() {
+                    @Override
+                    public void accept(UserBean userBean) throws Exception {
+                        if (userBean!=null){
+                            mView.loginSuccess(userBean);
+                        }
+
+                    }
+                },new RxException<>(e -> {
+                    e.printStackTrace();
+                    mView.showContent("登录失败");
+                }
+                ));
+        addDispose(disposable);
+    }
+
+    @Override
+    public void getCode(String phone) {
+        Disposable disposable = mApiFactory.getUserApi().SendCode(phone)
                 .compose(RxSchedulers.io_main())
                 .subscribe(new Consumer<BaseHttpResponse>() {
                     @Override
                     public void accept(BaseHttpResponse baseHttpResponse) throws Exception {
-                        if (baseHttpResponse.isSuccess()) {
-                            mView.takeoutNewSuccess();
-                        }else{
-                            mView.showContent(baseHttpResponse.getMessage());
+                        if (!baseHttpResponse.isSuccess()){
+                            mView.showContent("发送验证码失败");
                         }
+                    }
+                } ,new RxException<>(e -> {
+                    e.printStackTrace();
+                    mView.showContent("发送验证码失败");
+                }
+                ));
+        addDispose(disposable);
+    }
 
+    @Override
+    public void subscribeCode(String code) {
+        Disposable disposable = mApiFactory.getOperateApi().subscribeCode(code)
+                .compose(RxSchedulers.io_main())
+                .compose(RxResult.handleResult())
+                .subscribe(new Consumer<SubscribeBean>() {
+                    @Override
+                    public void accept(SubscribeBean subscribeBean) throws Exception {
+                        mView.subscribeSuccess(subscribeBean);
                     }
                 }, new Consumer<Throwable>() {
                     @Override
@@ -200,49 +198,24 @@ public class OperatePresenter extends RxPresenter<OperateContract.View> implemen
     }
 
     @Override
-    public void putInNew(String oldOrderId) {
-        Disposable disposable = mApiFactory.getOperateApi().putInNew(oldOrderId)
+    public void logout(String ticket) {
+        Disposable disposable = mApiFactory.getUserApi().logout(ticket)
                 .compose(RxSchedulers.io_main())
                 .subscribe(new Consumer<BaseHttpResponse>() {
                     @Override
-                    public void accept(BaseHttpResponse baseHttpResponse) throws Exception {
-                        if (baseHttpResponse.isSuccess()) {
+                    public void accept(BaseHttpResponse response) throws Exception {
+                        if (response.isSuccess()){
+                            mView.logoutSuccess();
                         }else{
-                            mView.showContent(baseHttpResponse.getMessage());
+                            mView.showContent("登出失败，请联系客服");
                         }
-
                     }
-                }, new Consumer<Throwable>() {
-                    @Override
-                    public void accept(Throwable throwable) throws Exception {
-                        mView.showContent(throwable.getMessage());
-                    }
-                });
+                }, new RxException<>(e -> {
+                    e.printStackTrace();
+                    mView.showContent(e.getMessage());
+                }
+                ));
         addDispose(disposable);
-    }
-
-    @Override
-    public void getMemberDetail() {
-        Disposable disposable = mApiFactory.getOperateApi().getMemberDetail()
-                .compose(RxSchedulers.io_main())
-                .subscribe(new Consumer<HttpResponse<MemberBean>>() {
-                    @Override
-                    public void accept(HttpResponse<MemberBean> response) throws Exception {
-                        if (response.isSuccess()) {
-                            mView.showMemberDetail(response.getData());
-                        }else{
-                            mView.showContent(response.getMessage());
-                        }
-
-                    }
-                }, new Consumer<Throwable>() {
-                    @Override
-                    public void accept(Throwable throwable) throws Exception {
-                        mView.showContent(throwable.getMessage());
-                    }
-                });
-        addDispose(disposable);
-
     }
 
 

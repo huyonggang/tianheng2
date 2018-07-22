@@ -25,6 +25,8 @@ import com.tianheng.client.R;
 import com.tianheng.client.base.BaseActivity;
 import com.tianheng.client.model.bean.MemberBean;
 import com.tianheng.client.model.bean.UserBean;
+import com.tianheng.client.model.bean.UserMemberBean;
+import com.tianheng.client.model.event.CloseUserEvent;
 import com.tianheng.client.model.event.LoginEvent;
 import com.tianheng.client.model.event.MemberEvent;
 import com.tianheng.client.presenter.UserPresenter;
@@ -109,6 +111,18 @@ public class UserActivity extends BaseActivity<UserPresenter> implements UserCon
     @Override
     protected void onStart() {
         super.onStart();
+        if (!EventBus.getDefault().isRegistered(this)){
+            EventBus.getDefault().register(this);
+        }
+    }
+
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if (EventBus.getDefault().isRegistered(this)){
+            EventBus.getDefault().unregister(this);
+        }
     }
 
     @Override
@@ -275,13 +289,13 @@ public class UserActivity extends BaseActivity<UserPresenter> implements UserCon
 
     @Subscribe
     public void onEvent(MemberEvent event) {
-        MemberBean memberBean = event.memberBean;
+        UserMemberBean memberBean = event.memberBean;
         if (memberBean != null) {
             String ticket = memberBean.getTicket();
             if (!TextUtils.isEmpty(ticket)) {
                 App.getInstance().setTicket(ticket);
             }
-            finish();
+            this.finish();
         }
     }
 
@@ -304,4 +318,6 @@ public class UserActivity extends BaseActivity<UserPresenter> implements UserCon
         super.onDestroy();
         mTimer.cancel();
     }
+
+
 }

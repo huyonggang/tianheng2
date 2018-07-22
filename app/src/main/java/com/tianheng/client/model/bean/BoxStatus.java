@@ -5,6 +5,16 @@ package com.tianheng.client.model.bean;
  */
 public class BoxStatus {
     private boolean isEmpty;
+    private int boxNum;
+
+    public int getBoxNum() {
+        return boxNum;
+    }
+
+    public void setBoxNum(int boxNum) {
+        this.boxNum = boxNum;
+    }
+
 
     public boolean getEmpty() {
         return isEmpty;

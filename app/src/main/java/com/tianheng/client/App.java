@@ -46,8 +46,8 @@ public class App extends MultiDexApplication{
             Stetho.initializeWithDefaults(this);
         }
         //jpush
-        JPushInterface.setDebugMode(true); 	// 设置开启日志,发布时请关闭日志
-         JPushInterface.init(this);     		// 初始化 JPush
+        //JPushInterface.setDebugMode(true); 	// 设置开启日志,发布时请关闭日志
+         //JPushInterface.init(this);     		// 初始化 JPush
         SpeechUtility.createUtility(this,param);
         initCrash();
     }

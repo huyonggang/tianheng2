@@ -79,8 +79,8 @@ public class SerialPortService extends Service implements SerialPortUtil.OnDataR
                 } else {
                     if (frameBuffer.length() > 30) {
                         int twoIndex = frameBuffer.indexOf(HEAD, 1);//第二个头的位置
-                        if (twoIndex >0 && frameBuffer.length() > twoIndex) {
-                            String frame = frameBuffer.substring(0,twoIndex);
+                        if (twoIndex > 0 && frameBuffer.length() > twoIndex) {
+                            String frame = frameBuffer.substring(0, twoIndex);
                             if (!frame.equals(lastFrame)) {
                                 Message message = Message.obtain();
                                 message.obj = frame;
@@ -100,24 +100,27 @@ public class SerialPortService extends Service implements SerialPortUtil.OnDataR
         @Override
         public void handleMessage(Message msg) {
             String realFrame = (String) msg.obj;
-            Log.d(TAG,"realFrame--->"+realFrame);
-            if (Const.FRAME_80.equals(realFrame.substring(8, 10))) {
-                batteryFrame.head = realFrame.substring(0, 4);
-                batteryFrame.device = realFrame.substring(4, 8);
-                batteryFrame.fixed = realFrame.substring(8, 10);
-                batteryFrame.voltage = realFrame.substring(10, 14);
-                batteryFrame.electric = realFrame.substring(14, 18);
-                batteryFrame.status = realFrame.substring(18, 20);
-                batteryFrame.bms = realFrame.substring(20, 22);
-                batteryFrame.keep = realFrame.substring(22, 24);
-                EventBus.getDefault().post(batteryFrame);
-            } else {
-                forwardFrame.head = realFrame.substring(0, 4);
-                forwardFrame.device = realFrame.substring(4, 8);
-                forwardFrame.packNo = realFrame.substring(8, 10);
-                forwardFrame.data = realFrame.substring(10, realFrame.length());
-                EventBus.getDefault().post(forwardFrame);
+            Log.d(TAG, "realFrame--->" + realFrame);
+            if (realFrame.length() == 24) {
+                if (Const.FRAME_80.equals(realFrame.substring(8, 10))) {
+                    batteryFrame.head = realFrame.substring(0, 4);
+                    batteryFrame.device = realFrame.substring(4, 8);
+                    batteryFrame.fixed = realFrame.substring(8, 10);
+                    batteryFrame.voltage = realFrame.substring(10, 14);
+                    batteryFrame.electric = realFrame.substring(14, 18);
+                    batteryFrame.status = realFrame.substring(18, 20);
+                    batteryFrame.bms = realFrame.substring(20, 22);
+                    batteryFrame.keep = realFrame.substring(22, 24);
+                    EventBus.getDefault().post(batteryFrame);
+                } else {
+                    forwardFrame.head = realFrame.substring(0, 4);
+                    forwardFrame.device = realFrame.substring(4, 8);
+                    forwardFrame.packNo = realFrame.substring(8, 10);
+                    forwardFrame.data = realFrame.substring(10, realFrame.length());
+                    EventBus.getDefault().post(forwardFrame);
+                }
             }
+
         }
     }
 

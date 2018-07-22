@@ -7,26 +7,19 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
-import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v7.widget.Toolbar;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 import android.util.Log;
-import android.view.Gravity;
-import android.view.KeyEvent;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.FrameLayout;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.tianheng.client.App;
@@ -39,7 +32,6 @@ import com.tianheng.client.presenter.HomePresenter;
 import com.tianheng.client.presenter.contract.HomeContract;
 import com.tianheng.client.service.SClientService;
 import com.tianheng.client.service.SerialPortService;
-import com.tianheng.client.ui.fragment.BatteryFragment;
 import com.tianheng.client.ui.fragment.OperateFragment;
 import com.tianheng.client.util.DataUtils;
 import com.tianheng.client.util.GlideImageLoader;
@@ -55,7 +47,6 @@ import java.util.List;
 import butterknife.BindView;
 import cn.jpush.android.api.JPushInterface;
 import cn.pedant.SweetAlert.SweetAlertDialog;
-import io.netty.handler.codec.base64.Base64;
 
 /**
  * Created by huyg on 2017/12/25.
@@ -64,17 +55,12 @@ import io.netty.handler.codec.base64.Base64;
 public class HomeActivity extends BaseActivity<HomePresenter> implements HomeContract.View, OperateFragment.OperateListener {
 
 
-    @BindView(R.id.home_left)
-    FrameLayout mLeft;
-    @BindView(R.id.home_right)
-    FrameLayout mRight;
-    @BindView(R.id.toolbar)
-    Toolbar mToolbar;
+    @BindView(R.id.fragment)
+    FrameLayout mFrame;
     @BindView(R.id.banner)
     Banner mBanner;
 
     private OperateFragment mOperateFragment;
-    private BatteryFragment mBatteryFragment;
     private FragmentManager mFragmentManager;
     private SClientService mService;
     private Intent serviceIn = new Intent();
@@ -96,11 +82,15 @@ public class HomeActivity extends BaseActivity<HomePresenter> implements HomeCon
 
     @Override
     protected int getLayout() {
+        requestWindowFeature(Window.FEATURE_NO_TITLE);// 隐藏标题
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                WindowManager.LayoutParams.FLAG_FULLSCREEN);// 设置全屏
         return R.layout.activity_home;
     }
 
     @Override
     protected void init() {
+
         mHander.sendEmptyMessageAtTime(0, 10 * 1000);
         initService();
         initData();
@@ -120,38 +110,29 @@ public class HomeActivity extends BaseActivity<HomePresenter> implements HomeCon
     private void getImei() {
         TelephonyManager telephonyManager = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
             return;
         }
         String imei = telephonyManager.getDeviceId();
         App.getInstance().setImei(imei);
+        JPushInterface.setAlias(this, 0, imei);
     }
 
     private void initService() {
         serviceIn.setClass(this, SClientService.class);
         portIn.setClass(this, SerialPortService.class);
-        bindService(portIn, mConnection, BIND_AUTO_CREATE);
-        bindService(serviceIn, mClientConn, BIND_AUTO_CREATE);
+        //bindService(portIn, mConnection, BIND_AUTO_CREATE);
+        //bindService(serviceIn, mClientConn, BIND_AUTO_CREATE);
     }
 
     private void initFragment() {
         mOperateFragment = OperateFragment.newInstance();
-        mBatteryFragment = BatteryFragment.newInstance();
         mFragmentManager = getSupportFragmentManager();
         FragmentTransaction ft = mFragmentManager.beginTransaction();
-        ft.replace(R.id.home_left, mOperateFragment);
-        ft.replace(R.id.home_right, mBatteryFragment);
+        ft.replace(R.id.fragment, mOperateFragment);
         ft.commit();
     }
 
     private void initView() {
-        initToolbar();
         initFragment();
         initBanner();
         initDialog();
@@ -205,53 +186,8 @@ public class HomeActivity extends BaseActivity<HomePresenter> implements HomeCon
             @Override
             public void OnBannerClick(int position) {
                 mBanner.setVisibility(View.GONE);
-                mCabinetManager.getDoorsStatus(0,8);
             }
         });
-    }
-
-    private void initToolbar() {
-        mSubView = new TextView(this);
-        mSubView.setTextSize(40);
-        mSubView.setTextColor(Color.WHITE);
-        mSubView.setText("设置");
-        //设定布局的各种参数
-        Toolbar.LayoutParams params = new Toolbar.LayoutParams(
-                Toolbar.LayoutParams.WRAP_CONTENT,
-                Toolbar.LayoutParams.WRAP_CONTENT,
-                Gravity.RIGHT);
-        params.rightMargin = 30;
-        mSubView.setLayoutParams(params);
-        mTitleView = new TextView(this);
-        mTitleView.setTextSize(40);
-        mTitleView.setTextColor(Color.WHITE);
-        mTitleView.setText("天恒新能源");
-        //设定布局的各种参数
-        Toolbar.LayoutParams titleParams = new Toolbar.LayoutParams(
-                Toolbar.LayoutParams.WRAP_CONTENT,
-                Toolbar.LayoutParams.WRAP_CONTENT,
-                Gravity.CENTER);
-        mTitleView.setLayoutParams(titleParams);
-
-        mToolbar.addView(mSubView);
-        mToolbar.addView(mTitleView);
-//        mSubView.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                Intent intent = new Intent(HomeActivity.this, SettingActivity.class);
-//                startActivity(intent);
-//            }
-//        });
-        mSubView.setVisibility(View.GONE);
-        mToolbar.setTitle("");
-        setSupportActionBar(mToolbar);
-
-    }
-
-    @Override
-    protected void onNewIntent(Intent intent) {
-        super.onNewIntent(intent);
-        finish();
     }
 
 
@@ -265,12 +201,6 @@ public class HomeActivity extends BaseActivity<HomePresenter> implements HomeCon
     @Override
     protected void onResume() {
         super.onResume();
-//        mSubView.setVisibility(View.VISIBLE);
-//        if (App.getInstance().isRoot()) {
-//            mSubView.setVisibility(View.VISIBLE);
-//        } else {
-//            mSubView.setVisibility(View.GONE);
-//        }
     }
 
     @Override
@@ -295,6 +225,10 @@ public class HomeActivity extends BaseActivity<HomePresenter> implements HomeCon
         mClientService.sendFrame(bmsFrame);
     }
 
+    @Override
+    public void sendEmptyBox(int boxNum) {
+        mClientService.sendEmptyBox(boxNum);
+    }
 
 
     private class MyHandler extends Handler {

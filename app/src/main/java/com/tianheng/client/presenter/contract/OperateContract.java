@@ -5,6 +5,8 @@ import com.tianheng.client.base.BaseView;
 import com.tianheng.client.model.bean.ExchangeBean;
 import com.tianheng.client.model.bean.MemberBean;
 import com.tianheng.client.model.bean.OrderBean;
+import com.tianheng.client.model.bean.SubscribeBean;
+import com.tianheng.client.model.bean.UserBean;
 
 import java.util.List;
 
@@ -17,26 +19,25 @@ public interface OperateContract {
     interface View extends BaseView {
 
         void openDoor(ExchangeBean exchangeBean);
-        void putOldSuccess();
         void closeOldSuccess(OrderBean orderBean);
-        void logoutSuccess();
-        void takeoutNewSuccess();
         void closeNewSuccess();
-        void showMemberDetail(MemberBean memberBean);
+        void closeDialog();
+        void showQRImg(String url);
+        void loginSuccess(UserBean userBean);
+        void subscribeSuccess(SubscribeBean subscribeBean);
+        void logoutSuccess();
     }
 
     interface Presenter extends BasePresenter<View>{
 
         void exchange();
-        void putInOld();
-        void closeNew(String oldOrderId);
-        void loginOut(String ticket);
-        void takeoutOld();
+        void closeNew(int exchangeBoxNumber,String exchangeBatteryNumber);
         void speak(String content);
-        void closeOld(int contain,String leaseBatteryNumber,int emptyBoxNumber,int exchangeBoxNumber,String exchangeBatteryNumber);
-        void takeoutNew(String oldOrderId);
-        void putInNew(String oldOrderId);
-
-        void getMemberDetail();
+        void closeOld(String leaseBatteryNumber,int emptyBoxNumber);
+        void getQRCode(String cabinetNumber,int imgWidth,int imgHeight,String imgType);
+        void login(String phone,String code);
+        void getCode(String phone);
+        void subscribeCode(String code);
+        void logout(String ticket);
     }
 }

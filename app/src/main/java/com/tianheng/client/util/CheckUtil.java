@@ -100,4 +100,5 @@ public class CheckUtil {
         int num = Integer.parseInt(capacity, 16);
         return num != 0;
     }
+
 }

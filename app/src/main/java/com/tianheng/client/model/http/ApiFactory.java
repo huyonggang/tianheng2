@@ -13,6 +13,9 @@ public class ApiFactory {
     private BatteryApi mBatteryApi;
     private OperateApi mOperateApi;
     private OtherApi mOtherApi;
+    private UserApi mUserApi;
+
+
 
     public OtherApi getOtherApi() {
         return mOtherApi;
@@ -31,7 +34,7 @@ public class ApiFactory {
         return mBatteryApi;
     }
 
-    private UserApi mUserApi;
+
 
 
     public ApiFactory() {

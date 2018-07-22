@@ -38,7 +38,7 @@ public class UserPresenter extends RxPresenter<UserContract.View> implements Use
 
     @Override
     public void getQRCode(String cabinetNumber, int imgWidth, int imgHeight, String imgType) {
-        Disposable disposable = mApiFactory.getUserApi().createQRCode(cabinetNumber,imgWidth,imgHeight,imgType)
+        Disposable disposable = mApiFactory.getUserApi().createQRCode("653101421454007",imgWidth,imgHeight,imgType)
                 .compose(RxSchedulers.io_main())
                 .subscribe(new Consumer<HttpResponse<String>>() {
                     @Override
