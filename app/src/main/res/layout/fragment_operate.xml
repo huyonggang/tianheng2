@@ -72,6 +72,7 @@
 
 
             <TextView
+                android:id="@+id/input_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
@@ -79,6 +80,8 @@
                 android:textSize="60sp"
                 android:layout_marginTop="60dp"
                 android:textColor="@color/_259b24"
+                android:focusable="true"
+                android:focusableInTouchMode="true"
                 />
 
             <EditText
@@ -91,7 +94,8 @@
                 android:layout_marginRight="40dp"
                 android:hint="请输入预约码"
                 android:textSize="50sp"
-                android:paddingLeft="8dp"
+                android:paddingLeft="16dp"
+                android:textCursorDrawable="@drawable/shape_input_cursor"
                 />
 
             <Button
@@ -115,20 +119,20 @@
 
 
     <FrameLayout
-        android:layout_width="900dp"
-        android:layout_height="400dp"
+        android:id="@+id/keyboard_layout"
+        android:layout_width="600dp"
+        android:layout_height="360dp"
         android:layout_gravity="bottom|center_horizontal"
         android:layout_marginLeft="300dp"
+        android:background="@color/_FFFFFF"
         >
 
 
-        <android.inputmethodservice.KeyboardView
+        <com.tianheng.client.wedget.NumberKeyboardView
             android:id="@+id/keyboard"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-
-            />
+            android:layout_width="400dp"
+            android:layout_height="400dp"
+            android:layout_gravity="center_horizontal|top" />
 
 
     </FrameLayout>

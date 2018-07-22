@@ -13,6 +13,7 @@ import android.os.Message;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.AlertDialog;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 import android.util.Log;
@@ -36,6 +37,7 @@ import com.tianheng.client.ui.fragment.OperateFragment;
 import com.tianheng.client.util.DataUtils;
 import com.tianheng.client.util.GlideImageLoader;
 import com.tianheng.client.util.ToastUtil;
+import com.tianheng.client.wedget.loading.ShapeLoadingDialog;
 import com.youth.banner.Banner;
 import com.youth.banner.BannerConfig;
 import com.youth.banner.listener.OnBannerListener;
@@ -46,7 +48,6 @@ import java.util.List;
 
 import butterknife.BindView;
 import cn.jpush.android.api.JPushInterface;
-import cn.pedant.SweetAlert.SweetAlertDialog;
 
 /**
  * Created by huyg on 2017/12/25.
@@ -72,7 +73,8 @@ public class HomeActivity extends BaseActivity<HomePresenter> implements HomeCon
     private List<String> images = null;
     private SerialPortService mPortService;
     private SClientService mClientService;
-    private SweetAlertDialog mDialog;
+    private ShapeLoadingDialog mDialog;
+    private ShapeLoadingDialog.Builder mBuilder;
     private CabinetManager mCabinetManager;
 
     @Override
@@ -192,9 +194,7 @@ public class HomeActivity extends BaseActivity<HomePresenter> implements HomeCon
 
 
     private void initDialog() {
-        mDialog = new SweetAlertDialog(this, SweetAlertDialog.PROGRESS_TYPE);
-        mDialog.getProgressHelper().setBarColor(Color.parseColor("#A5DC86"));
-        mDialog.setCancelable(false);
+        mBuilder = new ShapeLoadingDialog.Builder(this);
 
     }
 
@@ -205,13 +205,17 @@ public class HomeActivity extends BaseActivity<HomePresenter> implements HomeCon
 
     @Override
     public void showDialog(String message) {
-        mDialog.setTitleText(message);
+        mDialog = mBuilder.loadText(message).build();
         mDialog.show();
+
     }
 
     @Override
     public void closeDialog() {
-        mDialog.dismiss();
+        if (mDialog.isShowing()){
+            mDialog.dismiss();
+        }
+
     }
 
     @Override

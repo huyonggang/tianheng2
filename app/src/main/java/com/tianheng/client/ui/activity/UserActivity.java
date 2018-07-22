@@ -231,7 +231,7 @@ public class UserActivity extends BaseActivity<UserPresenter> implements UserCon
             }
 
             @Override
-            public void onNumberDeleteAll() {
+            public void onHintKeyboard() {
                 setTextContent("");
             }
         });

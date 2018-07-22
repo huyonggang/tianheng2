@@ -128,11 +128,13 @@ public class OperatePresenter extends RxPresenter<OperateContract.View> implemen
                             if (!TextUtils.isEmpty(url)){
                                 mView.showQRImg(url);
                             }
+                        }else {
+                            mView.showContent(response.getMessage());
                         }
 
                     }
                 }, new RxException<>(e -> {
-                    e.printStackTrace();
+                    mView.showContent(e.getMessage());
                 }
                 ));
         addDispose(disposable);

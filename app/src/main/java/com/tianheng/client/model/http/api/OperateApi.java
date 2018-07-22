@@ -45,7 +45,7 @@ public interface OperateApi {
                                           @Field("exchangeBatteryNumber") String exchangeBatteryNumber);
 
     @FormUrlEncoded
-    @POST("subscribeCode")
+    @POST("cabinet/subscribeCode")
     Observable<HttpResponse<SubscribeBean>> subscribeCode(@Field("code") String code);
 
 

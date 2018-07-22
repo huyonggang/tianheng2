@@ -52,7 +52,8 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity android:name=".ui.activity.HomeActivity"
-            android:launchMode="singleTask">
+            android:launchMode="singleTask"
+            android:windowSoftInputMode="stateAlwaysHidden">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -67,7 +68,6 @@
             />
 
         <activity android:name=".ui.activity.SettingActivity"/>
-        <activity android:name=".ui.activity.TestActivity"/>
 
         <service android:name=".service.SClientService"
             android:exported="false"

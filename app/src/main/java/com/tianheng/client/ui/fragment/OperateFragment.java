@@ -1,9 +1,7 @@
 package com.tianheng.client.ui.fragment;
 
 import android.content.Context;
-import android.content.Intent;
 import android.inputmethodservice.KeyboardView;
-import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.Message;
 import android.text.TextUtils;
@@ -12,12 +10,12 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
-import com.dd.processbutton.FlatButton;
 import com.tianheng.client.App;
 import com.tianheng.client.R;
 import com.tianheng.client.base.BaseFragment;
@@ -25,7 +23,6 @@ import com.tianheng.client.broad.CabinetManager;
 import com.tianheng.client.global.Const;
 import com.tianheng.client.model.bean.BoxStatus;
 import com.tianheng.client.model.bean.ExchangeBean;
-import com.tianheng.client.model.bean.MemberBean;
 import com.tianheng.client.model.bean.OrderBean;
 import com.tianheng.client.model.bean.SubscribeBean;
 import com.tianheng.client.model.bean.UserBean;
@@ -38,7 +35,6 @@ import com.tianheng.client.model.frame.BatteryFrame;
 import com.tianheng.client.model.frame.ForwardFrame;
 import com.tianheng.client.presenter.OperatePresenter;
 import com.tianheng.client.presenter.contract.OperateContract;
-import com.tianheng.client.ui.activity.UserActivity;
 import com.tianheng.client.util.CheckUtil;
 import com.tianheng.client.util.DecodeFrame;
 import com.tianheng.client.util.EncodeFrame;
@@ -47,11 +43,8 @@ import com.tianheng.client.wedget.NumberKeyboardView;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
-import org.greenrobot.eventbus.ThreadMode;
-
 
 import java.lang.reflect.Method;
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
@@ -60,10 +53,8 @@ import java.util.concurrent.TimeUnit;
 
 import butterknife.BindView;
 import butterknife.OnClick;
-import cn.jpush.android.api.JPushInterface;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
@@ -87,13 +78,14 @@ public class OperateFragment extends BaseFragment<OperatePresenter> implements O
     EditText mInputCode;
     @BindView(R.id.keyboard)
     NumberKeyboardView mKeyboard;
+    @BindView(R.id.keyboard_layout)
+    FrameLayout mKeyboardLayout;
+    @BindView(R.id.input_title)
+    TextView mIputTitle;
 
-    @OnClick({R.id.user_get_code, R.id.exchange})
+    @OnClick({R.id.exchange})
     public void onClick(View view) {
         switch (view.getId()) {
-            case R.id.user_get_code:
-                getCode();
-                break;
             case R.id.exchange:
                 String code = mInputCode.getText().toString().trim();
                 if (TextUtils.isEmpty(code)) {
@@ -194,6 +186,7 @@ public class OperateFragment extends BaseFragment<OperatePresenter> implements O
     }
 
     private void initView() {
+        mKeyboardLayout.setVisibility(View.GONE);
         initEditText();
         initKeyboard();
     }
@@ -201,7 +194,7 @@ public class OperateFragment extends BaseFragment<OperatePresenter> implements O
 
     @Override
     public void showContent(String message) {
-//        ToastUtil.showShort(getActivity(), message);
+        ToastUtil.showShort(getActivity(), message);
     }
 
 
@@ -539,6 +532,7 @@ public class OperateFragment extends BaseFragment<OperatePresenter> implements O
     public void subscribeSuccess(SubscribeBean subscribeBean) {
         App.getInstance().setTicket(subscribeBean.getTicket());
         this.mExchangeBean = subscribeBean.getExchangeModel();
+
         sendShowMessage("正在打开箱门，请稍后...");
         status = 1;
         mCabinetManager.openDoor(0, mExchangeBean.getEmptyBoxNumber());
@@ -549,62 +543,26 @@ public class OperateFragment extends BaseFragment<OperatePresenter> implements O
 
     }
 
-    private void login() {
-        String phone = mPhone.getText().toString().trim();
-        String code = mCode.getText().toString().trim();
-        if (TextUtils.isEmpty(phone)) {
-            showContent("请输入手机号");
-            return;
-        }
 
-        if (TextUtils.isEmpty(code)) {
-            showContent("请输入验证码");
-            return;
-        }
-        mPresenter.login(phone, code);
-    }
-
-
-    private void getCode() {
-        String phone = mPhone.getText().toString().trim();
-        if (!TextUtils.isEmpty(phone)) {
-            mPresenter.getCode(phone);
-            mGetCode.setClickable(false);
-            mTimer.start();
-
-        } else {
-            showContent("请输入手机号");
-        }
-    }
-
-    private CountDownTimer mTimer = new CountDownTimer(60 * 1000, 1000) {
-        @Override
-        public void onTick(long millisUntilFinished) {
-            mGetCode.setText(millisUntilFinished / 1000 + "秒");
-        }
-
-        @Override
-        public void onFinish() {
-            mTimer.cancel();
-            mGetCode.setText("获取验证码");
-            mGetCode.setClickable(true);
-        }
-    };
 
 
     private void initEditText() {
+
         if (android.os.Build.VERSION.SDK_INT > 10) {//4.0以上 danielinbiti
             try {
                 Class<EditText> cls = EditText.class;
                 Method setShowSoftInputOnFocus;
                 setShowSoftInputOnFocus = cls.getMethod("setShowSoftInputOnFocus",
                         boolean.class);
-                setShowSoftInputOnFocus.setAccessible(true);
+                setShowSoftInputOnFocus.setAccessible(false);
                 setShowSoftInputOnFocus.invoke(mInputCode, false);
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
+        mInputCode.clearFocus();
+        mIputTitle.requestFocus();
+        mIputTitle.requestFocusFromTouch();
         mInputCode.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
@@ -612,6 +570,7 @@ public class OperateFragment extends BaseFragment<OperatePresenter> implements O
                     //隐藏系统软键盘
                     InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
                     imm.hideSoftInputFromWindow(mInputCode.getWindowToken(), 0);
+                    mKeyboardLayout.setVisibility(View.VISIBLE);
                 }
             }
         });
@@ -636,8 +595,11 @@ public class OperateFragment extends BaseFragment<OperatePresenter> implements O
             }
 
             @Override
-            public void onNumberDeleteAll() {
-                setTextContent("");
+            public void onHintKeyboard() {
+                mInputCode.clearFocus();
+                mIputTitle.requestFocus();
+                mIputTitle.requestFocusFromTouch();
+                mKeyboardLayout.setVisibility(View.GONE);
             }
         });
     }
