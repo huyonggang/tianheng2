@@ -261,8 +261,8 @@ public class HomeActivity extends BaseActivity<HomePresenter> implements HomeCon
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        unbindService(mClientConn);
-        unbindService(mConnection);
+        //unbindService(mClientConn);
+        //unbindService(mConnection);
     }
 
     @Override

@@ -28,6 +28,11 @@
         <item name="android:backgroundDimEnabled">true</item>
         <item name="android:backgroundDimAmount">0.6</item>
     </style>
+    <style name="tab_text_appearance">
+        <item name="android:textSize">60sp</item>
+
+
+    </style>
 
 
 </resources>

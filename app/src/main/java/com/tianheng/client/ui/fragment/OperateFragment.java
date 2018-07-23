@@ -2,8 +2,10 @@ package com.tianheng.client.ui.fragment;
 
 import android.content.Context;
 import android.inputmethodservice.KeyboardView;
+import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.Message;
+import android.support.design.widget.TabLayout;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -12,10 +14,12 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.dd.processbutton.FlatButton;
 import com.tianheng.client.App;
 import com.tianheng.client.R;
 import com.tianheng.client.base.BaseFragment;
@@ -35,6 +39,7 @@ import com.tianheng.client.model.frame.BatteryFrame;
 import com.tianheng.client.model.frame.ForwardFrame;
 import com.tianheng.client.presenter.OperatePresenter;
 import com.tianheng.client.presenter.contract.OperateContract;
+import com.tianheng.client.ui.activity.UserActivity;
 import com.tianheng.client.util.CheckUtil;
 import com.tianheng.client.util.DecodeFrame;
 import com.tianheng.client.util.EncodeFrame;
@@ -72,6 +77,17 @@ public class OperateFragment extends BaseFragment<OperatePresenter> implements O
 
     @BindView(R.id.user_qr_code)
     ImageView mQRCode;
+
+    @BindView(R.id.input_ver_code)
+    EditText mCode;
+    @BindView(R.id.get_code)
+    Button mGetCode;
+    @BindView(R.id.login)
+    Button mLogin;
+    @BindView(R.id.input_phone)
+    EditText mPhone;
+
+
     @BindView(R.id.exchange)
     Button mExchange;
     @BindView(R.id.input_code)
@@ -82,10 +98,23 @@ public class OperateFragment extends BaseFragment<OperatePresenter> implements O
     FrameLayout mKeyboardLayout;
     @BindView(R.id.input_title)
     TextView mIputTitle;
+    @BindView(R.id.tab_layout)
+    TabLayout mTabLayout;
+    @BindView(R.id.login_layout)
+    LinearLayout mLoginLayout;
+    @BindView(R.id.subscribe_layout)
+    LinearLayout mSubscribeLayout;
 
-    @OnClick({R.id.exchange})
+
+    @OnClick({R.id.exchange, R.id.login, R.id.get_code})
     public void onClick(View view) {
         switch (view.getId()) {
+            case R.id.get_code:
+                getCode();
+                break;
+            case R.id.login:
+                login();
+                break;
             case R.id.exchange:
                 String code = mInputCode.getText().toString().trim();
                 if (TextUtils.isEmpty(code)) {
@@ -114,6 +143,7 @@ public class OperateFragment extends BaseFragment<OperatePresenter> implements O
     private Disposable disposable;
     private int deviceNo;
     private List<BoxStatus> boxStatuses = new ArrayList<>();
+    private int type;
 
 
     @Override
@@ -189,6 +219,34 @@ public class OperateFragment extends BaseFragment<OperatePresenter> implements O
         mKeyboardLayout.setVisibility(View.GONE);
         initEditText();
         initKeyboard();
+        initTab();
+    }
+
+    private void initTab() {
+        mTabLayout.addTab(mTabLayout.newTab().setText("登录"));
+        mTabLayout.addTab(mTabLayout.newTab().setText("预约"));
+        mTabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+            @Override
+            public void onTabSelected(TabLayout.Tab tab) {
+                if ("登录".equals(tab.getText())) {
+                    mLoginLayout.setVisibility(View.VISIBLE);
+                    mSubscribeLayout.setVisibility(View.GONE);
+                } else {
+                    mSubscribeLayout.setVisibility(View.VISIBLE);
+                    mLoginLayout.setVisibility(View.GONE);
+                }
+            }
+
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab) {
+
+            }
+
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) {
+
+            }
+        });
     }
 
 
@@ -255,6 +313,17 @@ public class OperateFragment extends BaseFragment<OperatePresenter> implements O
             if (status == 1 && event.iLockId == mExchangeBean.getEmptyBoxNumber()) {
                 sendShowMessage("请放入电池");
                 status = 2;
+                if (disposable == null || disposable.isDisposed()) {
+                    disposable = Observable.interval(0, 5, TimeUnit.SECONDS)
+                            .subscribeOn(Schedulers.io())
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .subscribe(new Consumer<Long>() {
+                                @Override
+                                public void accept(Long aLong) throws Exception {
+                                    mCabinetManager.getDoorStatus(0, mExchangeBean.getEmptyBoxNumber());
+                                }
+                            });
+                }
             } else if (status == 5 && event.iLockId == mExchangeBean.getExchangeBoxNumber()) {
                 status = 6;
                 sendShowMessage("请取出电池,并关闭箱门");
@@ -364,7 +433,7 @@ public class OperateFragment extends BaseFragment<OperatePresenter> implements O
     @Override
     public void openDoor(ExchangeBean exchangeBean) {
         this.mExchangeBean = exchangeBean;
-        sendShowMessage("正在打开箱门，请稍后...");
+        sendShowMessage("正在打开箱门，请稍后");
         status = 1;
         mCabinetManager.openDoor(0, mExchangeBean.getEmptyBoxNumber());
     }
@@ -544,8 +613,6 @@ public class OperateFragment extends BaseFragment<OperatePresenter> implements O
     }
 
 
-
-
     private void initEditText() {
 
         if (android.os.Build.VERSION.SDK_INT > 10) {//4.0以上 danielinbiti
@@ -556,20 +623,39 @@ public class OperateFragment extends BaseFragment<OperatePresenter> implements O
                         boolean.class);
                 setShowSoftInputOnFocus.setAccessible(false);
                 setShowSoftInputOnFocus.invoke(mInputCode, false);
+                setShowSoftInputOnFocus.invoke(mPhone, false);
+                setShowSoftInputOnFocus.invoke(mCode, false);
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
-        mInputCode.clearFocus();
-        mIputTitle.requestFocus();
-        mIputTitle.requestFocusFromTouch();
+        hindKeyboard();
         mInputCode.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
                 if (hasFocus) {
                     //隐藏系统软键盘
-                    InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-                    imm.hideSoftInputFromWindow(mInputCode.getWindowToken(), 0);
+                    type = 2;
+                    mKeyboardLayout.setVisibility(View.VISIBLE);
+                }
+            }
+        });
+
+        mPhone.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if (hasFocus) {
+                    type = 0;
+                    mKeyboardLayout.setVisibility(View.VISIBLE);
+                }
+            }
+        });
+
+        mCode.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if (hasFocus) {
+                    type = 1;
                     mKeyboardLayout.setVisibility(View.VISIBLE);
                 }
             }
@@ -577,36 +663,136 @@ public class OperateFragment extends BaseFragment<OperatePresenter> implements O
 
     }
 
+    private void hindKeyboard() {
+        mInputCode.clearFocus();
+        mPhone.clearFocus();
+        mCode.clearFocus();
+        mLogin.requestFocus();
+        mInputCode.clearFocus();
+        mLogin.requestFocusFromTouch();
+        mIputTitle.requestFocus();
+        mIputTitle.requestFocusFromTouch();
+        mKeyboardLayout.setVisibility(View.GONE);
+    }
+
     private void initKeyboard() {
         mKeyboard.setOnNumberClickListener(new NumberKeyboardView.OnNumberClickListener() {
             @Override
             public void onNumberReturn(String number) {
-                setTextContent(mInputCode.getText().toString() + number);
+
+                switch (type) {
+                    case 0:
+                        setTextContent(mPhone.getText().toString() + number);
+                        break;
+                    case 1:
+                        setTextContent(mCode.getText().toString() + number);
+                        break;
+                    case 2:
+                        setTextContent(mInputCode.getText().toString() + number);
+                        break;
+                }
             }
 
             @Override
             public void onNumberDelete() {
-                int length = mInputCode.getText().length();
-                if (length <= 1) {
-                    setTextContent("");
-                } else {
-                    setTextContent(mInputCode.getText().toString().substring(0, length - 1));
+
+                switch (type) {
+                    case 0:
+                        int length = mPhone.getText().length();
+                        if (length <= 1) {
+                            setTextContent("");
+                        } else {
+                            setTextContent(mPhone.getText().toString().substring(0, length - 1));
+                        }
+
+                        break;
+                    case 1:
+                        int codeLength = mCode.getText().length();
+                        if (codeLength <= 1) {
+                            setTextContent("");
+                        } else {
+                            setTextContent(mCode.getText().toString().substring(0, codeLength - 1));
+                        }
+                        break;
+                    case 2:
+                        int inputCode = mInputCode.getText().length();
+                        if (inputCode <= 1) {
+                            setTextContent("");
+                        } else {
+                            setTextContent(mInputCode.getText().toString().substring(0, inputCode - 1));
+                        }
+
+                        break;
                 }
             }
 
             @Override
             public void onHintKeyboard() {
-                mInputCode.clearFocus();
-                mIputTitle.requestFocus();
-                mIputTitle.requestFocusFromTouch();
-                mKeyboardLayout.setVisibility(View.GONE);
+                hindKeyboard();
+
             }
         });
     }
 
     private void setTextContent(String content) {
-        mInputCode.setText(content);
-        mInputCode.setSelection(content.length());
+        switch (type) {
+            case 0:
+                mPhone.setText(content);
+                mPhone.setSelection(content.length());
+                break;
+            case 1:
+                mCode.setText(content);
+                mCode.setSelection(content.length());
+                break;
+            case 2:
+                mInputCode.setText(content);
+                mInputCode.setSelection(content.length());
+                break;
+        }
+
     }
 
+
+    private void getCode() {
+        String phone = mPhone.getText().toString().trim();
+        if (!TextUtils.isEmpty(phone)) {
+            mPresenter.getCode(phone);
+            mGetCode.setClickable(false);
+            mTimer.start();
+        } else {
+            showContent("请输入手机号");
+        }
+    }
+
+
+    private void login() {
+        String phone = mPhone.getText().toString().trim();
+        String code = mCode.getText().toString().trim();
+        if (TextUtils.isEmpty(phone)) {
+            showContent("请输入手机号");
+            return;
+        }
+
+        if (TextUtils.isEmpty(code)) {
+            showContent("请输入验证码");
+            return;
+        }
+        mPresenter.login(phone, code);
+
+
+    }
+
+    private CountDownTimer mTimer = new CountDownTimer(60 * 1000, 1000) {
+        @Override
+        public void onTick(long millisUntilFinished) {
+            mGetCode.setText(millisUntilFinished / 1000 + "秒");
+        }
+
+        @Override
+        public void onFinish() {
+            mTimer.cancel();
+            mGetCode.setText("获取");
+            mGetCode.setClickable(true);
+        }
+    };
 }

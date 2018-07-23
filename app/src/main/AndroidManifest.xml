@@ -53,7 +53,7 @@
         android:theme="@style/AppTheme">
         <activity android:name=".ui.activity.HomeActivity"
             android:launchMode="singleTask"
-            android:windowSoftInputMode="stateAlwaysHidden">
+            android:windowSoftInputMode="stateAlwaysHidden|stateHidden">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

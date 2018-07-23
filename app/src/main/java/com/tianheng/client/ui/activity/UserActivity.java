@@ -92,8 +92,6 @@ public class UserActivity extends BaseActivity<UserPresenter> implements UserCon
             return;
         }
         mPresenter.login(phone, code);
-
-
     }
 
     private void getCode() {
