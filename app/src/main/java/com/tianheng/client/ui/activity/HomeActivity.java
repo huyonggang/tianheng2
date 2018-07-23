@@ -122,8 +122,8 @@ public class HomeActivity extends BaseActivity<HomePresenter> implements HomeCon
     private void initService() {
         serviceIn.setClass(this, SClientService.class);
         portIn.setClass(this, SerialPortService.class);
-        //bindService(portIn, mConnection, BIND_AUTO_CREATE);
-        //bindService(serviceIn, mClientConn, BIND_AUTO_CREATE);
+        bindService(portIn, mConnection, BIND_AUTO_CREATE);
+        bindService(serviceIn, mClientConn, BIND_AUTO_CREATE);
     }
 
     private void initFragment() {
@@ -195,7 +195,6 @@ public class HomeActivity extends BaseActivity<HomePresenter> implements HomeCon
 
     private void initDialog() {
         mBuilder = new ShapeLoadingDialog.Builder(this);
-
     }
 
     @Override
@@ -205,22 +204,19 @@ public class HomeActivity extends BaseActivity<HomePresenter> implements HomeCon
 
     @Override
     public void showDialog(String message) {
-        mDialog = mBuilder.loadText(message).build();
-        mDialog.show();
-
+        mDialog = mBuilder.loadText(message).show();
     }
 
     @Override
     public void closeDialog() {
-        if (mDialog.isShowing()){
+        if (mDialog != null) {
             mDialog.dismiss();
         }
-
     }
 
     @Override
     public void sendFrame(byte[] frame) {
-        Log.d("HomeActivity","sendFrame--->"+ DataUtils.bytes2HexString(frame,frame.length));
+        Log.d("HomeActivity", "sendFrame--->" + DataUtils.bytes2HexString(frame, frame.length));
         mPortService.sendData(frame);
     }
 
@@ -261,8 +257,8 @@ public class HomeActivity extends BaseActivity<HomePresenter> implements HomeCon
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        //unbindService(mClientConn);
-        //unbindService(mConnection);
+        unbindService(mClientConn);
+        unbindService(mConnection);
     }
 
     @Override

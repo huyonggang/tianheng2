@@ -30,8 +30,9 @@ public interface OperateApi {
 
     @FormUrlEncoded
     @POST("cabinet/putInOldAndClose")
-    Observable<HttpResponse<OrderBean>> closeOld(@Field("leaseBatteryNumber") String leaseBatteryNumber,
-                                                 @Field("emptyBoxNumber") int emptyBox);
+    Observable<BaseHttpResponse> closeOld(@Field("cabinetNumber") String cabinetNumber,
+                                          @Field("leaseBatteryNumber") String leaseBatteryNumber,
+                                          @Field("emptyBoxNumber") int emptyBox);
 
 
     /**
@@ -41,7 +42,8 @@ public interface OperateApi {
      */
     @FormUrlEncoded
     @POST("cabinet/takeOutNewAndClose")
-    Observable<BaseHttpResponse> closeNew(@Field("exchangeBoxNumber") int exchangeBoxNumber,
+    Observable<BaseHttpResponse> closeNew(@Field("cabinetNumber") String cabinetNumber,
+                                          @Field("exchangeBoxNumber") int exchangeBoxNumber,
                                           @Field("exchangeBatteryNumber") String exchangeBatteryNumber);
 
     @FormUrlEncoded

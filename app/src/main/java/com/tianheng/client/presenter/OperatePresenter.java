@@ -2,6 +2,7 @@ package com.tianheng.client.presenter;
 
 import android.text.TextUtils;
 
+import com.tianheng.client.App;
 import com.tianheng.client.base.RxPresenter;
 import com.tianheng.client.manage.TTSManage;
 import com.tianheng.client.model.bean.ExchangeBean;
@@ -46,6 +47,7 @@ public class OperatePresenter extends RxPresenter<OperateContract.View> implemen
                 .compose(RxSchedulers.io_main())
                 .compose(RxResult.handleResult())
                 .subscribe(exchangeBean -> {
+                    mView.closeDialog();
                     if (exchangeBean != null) {
                         mView.openDoor(exchangeBean);
                     }
@@ -59,11 +61,18 @@ public class OperatePresenter extends RxPresenter<OperateContract.View> implemen
 
     @Override
     public void closeNew(int exchangeBoxNumber,String exchangeBatteryNumber) {
-        Disposable disposable = mApiFactory.getOperateApi().closeNew(exchangeBoxNumber,exchangeBatteryNumber)
+        Disposable disposable = mApiFactory.getOperateApi().closeNew(App.getInstance().getImei(),exchangeBoxNumber,exchangeBatteryNumber)
                 .compose(RxSchedulers.io_main())
+                .doOnSubscribe(new Consumer<Disposable>() {
+                    @Override
+                    public void accept(Disposable disposable) throws Exception {
+                        mView.showContent("订单结算中..");
+                    }
+                })
                 .subscribe(new Consumer<BaseHttpResponse>() {
                     @Override
                     public void accept(BaseHttpResponse baseHttpResponse) throws Exception {
+                        mView.closeDialog();
                         if (baseHttpResponse.isSuccess()) {
                             mView.closeNewSuccess();
                         }else{
@@ -90,22 +99,30 @@ public class OperatePresenter extends RxPresenter<OperateContract.View> implemen
 
     @Override
     public void closeOld( String leaseBatteryNumber, int emptyBoxNumber) {
-        Disposable disposable = mApiFactory.getOperateApi().closeOld(leaseBatteryNumber, emptyBoxNumber)
+        Disposable disposable = mApiFactory.getOperateApi().closeOld(App.getInstance().getImei(),leaseBatteryNumber, emptyBoxNumber)
                 .compose(RxSchedulers.io_main())
-                .subscribe(new Consumer<HttpResponse<OrderBean>>() {
+                .doOnSubscribe(new Consumer<Disposable>() {
                     @Override
-                    public void accept(HttpResponse<OrderBean> response) throws Exception {
+                    public void accept(Disposable disposable) throws Exception {
+                        mView.showContent("订单结算中..");
+                    }
+                })
+                .subscribe(new Consumer<BaseHttpResponse>() {
+                    @Override
+                    public void accept(BaseHttpResponse response) throws Exception {
+                        mView.closeDialog();
                         if (response.isSuccess()) {
-                            mView.closeOldSuccess(response.getData());
+                            mView.closeOldSuccess();
                         }else{
                             mView.showContent(response.getMessage());
-                            mView.closeDialog();
+
                         }
 
                     }
                 }, new Consumer<Throwable>() {
                     @Override
                     public void accept(Throwable throwable) throws Exception {
+                        mView.closeDialog();
                         mView.showContent(throwable.getMessage());
                     }
                 });
@@ -118,7 +135,7 @@ public class OperatePresenter extends RxPresenter<OperateContract.View> implemen
 
     @Override
     public void getQRCode(String cabinetNumber, int imgWidth, int imgHeight, String imgType) {
-        Disposable disposable = mApiFactory.getUserApi().createQRCode("653101421454007",imgWidth,imgHeight,imgType)
+        Disposable disposable = mApiFactory.getUserApi().createQRCode(cabinetNumber,imgWidth,imgHeight,imgType)
                 .compose(RxSchedulers.io_main())
                 .subscribe(new Consumer<HttpResponse<String>>() {
                     @Override
@@ -142,20 +159,30 @@ public class OperatePresenter extends RxPresenter<OperateContract.View> implemen
 
     @Override
     public void login(String phone, String code) {
-        Disposable disposable = mApiFactory.getUserApi().login(phone,code, "653101421454007")
+        Disposable disposable = mApiFactory.getUserApi().login(phone,code, App.getInstance().getImei())
                 .compose(RxSchedulers.io_main())
                 .compose(RxResult.handleResult())
+                .doOnSubscribe(new Consumer<Disposable>() {
+                    @Override
+                    public void accept(Disposable disposable) throws Exception {
+                        mView.showDialog("登录中..");
+                    }
+                })
                 .subscribe(new Consumer<UserBean>() {
                     @Override
                     public void accept(UserBean userBean) throws Exception {
                         if (userBean!=null){
                             mView.loginSuccess(userBean);
+                        }else{
+                            mView.showContent("登录失败");
+                            mView.closeDialog();
                         }
 
                     }
                 },new RxException<>(e -> {
                     e.printStackTrace();
                     mView.showContent("登录失败");
+                    mView.closeDialog();
                 }
                 ));
         addDispose(disposable);
@@ -185,6 +212,12 @@ public class OperatePresenter extends RxPresenter<OperateContract.View> implemen
         Disposable disposable = mApiFactory.getOperateApi().subscribeCode(code)
                 .compose(RxSchedulers.io_main())
                 .compose(RxResult.handleResult())
+                .doOnSubscribe(new Consumer<Disposable>() {
+                    @Override
+                    public void accept(Disposable disposable) throws Exception {
+                        mView.showDialog("验证中..");
+                    }
+                })
                 .subscribe(new Consumer<SubscribeBean>() {
                     @Override
                     public void accept(SubscribeBean subscribeBean) throws Exception {
@@ -193,6 +226,7 @@ public class OperatePresenter extends RxPresenter<OperateContract.View> implemen
                 }, new Consumer<Throwable>() {
                     @Override
                     public void accept(Throwable throwable) throws Exception {
+                        mView.closeDialog();
                         mView.showContent(throwable.getMessage());
                     }
                 });
@@ -209,6 +243,7 @@ public class OperatePresenter extends RxPresenter<OperateContract.View> implemen
                         if (response.isSuccess()){
                             mView.logoutSuccess();
                         }else{
+
                             mView.showContent("登出失败，请联系客服");
                         }
                     }

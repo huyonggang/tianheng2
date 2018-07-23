@@ -77,7 +77,7 @@ public class NumberKeyboardView extends View {
         if (clickX > 0 && clickY > 0) {
             if (type == 0) {  //按下刷新
                 if ("delete".equals(number)) {
-                    mPaint.setColor(Color.BLACK);
+                    mPaint.setColor(Color.GRAY);
                     canvas.drawRoundRect(new RectF(x1, y1, x2, y2), 10, 10, mPaint);
                     canvas.drawBitmap(mBpDelete, xs[2] - mWidthOfBp / 2 + 10, ys[3] - mHeightOfBp / 2 - 10, mPaint);
                 } else {
@@ -87,7 +87,7 @@ public class NumberKeyboardView extends View {
                         mPaint.setColor(Color.GRAY);
                     }
                     canvas.drawRoundRect(new RectF(x1, y1, x2, y2), 10, 10, mPaint);
-                    mPaint.setColor(Color.BLACK);
+                    mPaint.setColor(Color.GRAY);
                     mPaint.setTextSize(40);// 设置字体大小
                     mPaint.setStrokeWidth(2);
                     canvas.drawText(number, clickX, clickY, mPaint);
@@ -104,7 +104,7 @@ public class NumberKeyboardView extends View {
                         mPaint.setColor(Color.WHITE);
                     }
                     canvas.drawRoundRect(new RectF(x1, y1, x2, y2), 10, 10, mPaint);
-                    mPaint.setColor(Color.BLACK);
+                    mPaint.setColor(Color.GRAY);
                     mPaint.setTextSize(40);// 设置字体大小
                     mPaint.setStrokeWidth(2);
                     canvas.drawText(number, clickX, clickY, mPaint);
@@ -147,7 +147,7 @@ public class NumberKeyboardView extends View {
      */
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     private void drawKeyboard(Canvas canvas) {
-        mPaint.setColor(Color.BLACK);
+        mPaint.setColor(Color.GRAY);
         //画宫格
         //第一排
         canvas.drawRoundRect(new RectF(10, 10, 10 + mRectWidth, 10 + mRectHeight), 10, 10, mPaint);
@@ -164,7 +164,7 @@ public class NumberKeyboardView extends View {
         //第四排
         mPaint.setColor(Color.GRAY);
         canvas.drawRoundRect(new RectF(10, 40 + 3 * mRectHeight, 10 + mRectWidth, 40 + 4 * mRectHeight), 10, 10, mPaint);
-        mPaint.setColor(Color.BLACK);
+        mPaint.setColor(Color.GRAY);
         canvas.drawRoundRect(new RectF(20 + mRectWidth, 40 + 3 * mRectHeight, 20 + 2 * mRectWidth, 40 + 4 * mRectHeight), 10, 10, mPaint);
         mPaint.setColor(Color.GRAY);
         canvas.drawRoundRect(new RectF(30 + 2 * mRectWidth, 40 + 3 * mRectHeight, 30 + 3 * mRectWidth, 40 + 4 * mRectHeight), 10, 10, mPaint);

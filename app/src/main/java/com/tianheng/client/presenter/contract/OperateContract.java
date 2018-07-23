@@ -19,9 +19,10 @@ public interface OperateContract {
     interface View extends BaseView {
 
         void openDoor(ExchangeBean exchangeBean);
-        void closeOldSuccess(OrderBean orderBean);
+        void closeOldSuccess();
         void closeNewSuccess();
         void closeDialog();
+        void showDialog(String message);
         void showQRImg(String url);
         void loginSuccess(UserBean userBean);
         void subscribeSuccess(SubscribeBean subscribeBean);

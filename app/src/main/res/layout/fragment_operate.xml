@@ -9,156 +9,56 @@
     >
 
     <LinearLayout
-        android:layout_width="1500dp"
-        android:layout_height="680dp"
+        android:layout_width="900dp"
+        android:layout_height="400dp"
         android:layout_gravity="center"
         android:background="@drawable/shape_operate"
-        android:orientation="vertical">
+        android:orientation="horizontal">
 
-        <android.support.design.widget.TabLayout
-            android:id="@+id/tab_layout"
-            android:layout_width="1500dp"
-            android:layout_height="100dp"
-            app:tabIndicatorColor="@color/_259b24"
-            app:tabMode="fixed"
-            app:tabSelectedTextColor="@color/_259b24"
-            app:tabTextAppearance="@style/tab_text_appearance"
-            app:tabTextColor="@color/black">
-
-
-        </android.support.design.widget.TabLayout>
 
         <LinearLayout
-            android:id="@+id/login_layout"
-            android:layout_width="1500dp"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-
-            >
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="2"
+            android:orientation="vertical">
 
 
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="2"
-                android:orientation="vertical">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="40dp"
+                android:text="扫码换电池"
+                android:textColor="@color/_259b24"
+                android:textSize="40sp"
 
+                />
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_horizontal"
-                    android:layout_marginTop="40dp"
-                    android:text="扫码换电池"
-                    android:textColor="@color/_259b24"
-                    android:textSize="60sp"
-
-                    />
-
-                <ImageView
-                    android:id="@+id/user_qr_code"
-                    android:layout_width="380dp"
-                    android:layout_height="380dp"
-                    android:layout_gravity="center"
-                    android:layout_marginTop="40dp" />
-
-
-            </LinearLayout>
-
-
-            <View
-                android:layout_width="4dp"
-                android:layout_height="match_parent"
-                android:layout_marginBottom="60dp"
-                android:layout_marginTop="60dp"
-                android:background="@color/_979797" />
-
-
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_gravity="center"
-                android:layout_weight="3"
-                android:orientation="vertical">
-
-
-                <EditText
-                    android:id="@+id/input_phone"
-                    android:layout_width="match_parent"
-                    android:layout_height="130dp"
-                    android:layout_marginLeft="40dp"
-                    android:layout_marginRight="40dp"
-                    android:layout_marginTop="40dp"
-                    android:background="@drawable/shape_input_code"
-                    android:hint="请输入手机号"
-                    android:paddingLeft="16dp"
-                    android:textCursorDrawable="@drawable/shape_input_cursor"
-                    android:textSize="50sp" />
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:layout_marginTop="40dp"
-                    android:layout_marginRight="40dp"
-                    >
-
-
-                    <EditText
-                        android:id="@+id/input_ver_code"
-                        android:layout_width="0dp"
-                        android:layout_weight="1"
-                        android:layout_height="130dp"
-                        android:layout_marginLeft="40dp"
-                        android:layout_marginRight="40dp"
-
-                        android:background="@drawable/shape_input_code"
-                        android:hint="请输入验证码"
-                        android:paddingLeft="16dp"
-                        android:textCursorDrawable="@drawable/shape_input_cursor"
-                        android:textSize="50sp" />
-
-                    <Button
-                        android:id="@+id/get_code"
-                        android:layout_width="160dp"
-                        android:layout_height="100dp"
-                        android:layout_gravity="center_vertical"
-                        android:text="获取"
-                        android:textSize="40sp"
-                        android:background="@drawable/shape_change"
-                        android:textColor="@color/_259b24"
-                        />
-
-                </LinearLayout>
-
-                <Button
-                    android:id="@+id/login"
-                    android:layout_width="match_parent"
-                    android:layout_height="120dp"
-                    android:layout_marginLeft="40dp"
-                    android:layout_marginRight="40dp"
-                    android:layout_marginTop="40dp"
-                    android:background="@drawable/shape_change"
-                    android:focusable="true"
-                    android:focusableInTouchMode="true"
-                    android:text="登录"
-                    android:textColor="@color/_259b24"
-                    android:textSize="50sp" />
-
-
-            </LinearLayout>
+            <ImageView
+                android:id="@+id/user_qr_code"
+                android:layout_width="300dp"
+                android:layout_height="300dp"
+                android:layout_gravity="center" />
 
 
         </LinearLayout>
 
 
+        <View
+            android:layout_width="4dp"
+            android:layout_height="match_parent"
+            android:layout_marginBottom="60dp"
+            android:layout_marginTop="60dp"
+            android:background="@color/_979797" />
+
+
         <LinearLayout
             android:id="@+id/subscribe_layout"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
+            android:layout_weight="3"
             android:layout_height="match_parent"
             android:layout_gravity="center"
             android:orientation="vertical"
-            android:visibility="gone"
             >
 
 
@@ -172,58 +72,66 @@
                 android:focusableInTouchMode="true"
                 android:text="预约码换电池"
                 android:textColor="@color/_259b24"
-                android:textSize="60sp" />
+                android:textSize="40sp" />
 
             <EditText
                 android:id="@+id/input_code"
                 android:layout_width="match_parent"
-                android:layout_height="130dp"
-                android:layout_marginLeft="40dp"
-                android:layout_marginRight="40dp"
+                android:layout_height="70dp"
+                android:layout_marginLeft="100dp"
+                android:layout_marginRight="100dp"
                 android:layout_marginTop="40dp"
                 android:background="@drawable/shape_input_code"
                 android:hint="请输入预约码"
                 android:paddingLeft="16dp"
                 android:textCursorDrawable="@drawable/shape_input_cursor"
-                android:textSize="50sp" />
+                android:textSize="40sp" />
 
             <Button
                 android:id="@+id/exchange"
                 android:layout_width="match_parent"
-                android:layout_height="130dp"
-                android:layout_marginLeft="40dp"
-                android:layout_marginRight="40dp"
-                android:layout_marginTop="40dp"
+                android:layout_height="70dp"
+                android:layout_marginLeft="140dp"
+                android:layout_marginRight="140dp"
+                android:layout_marginTop="60dp"
                 android:background="@drawable/shape_change"
                 android:text="更换电池"
-                android:textColor="@color/_259b24"
-                android:textSize="50sp" />
+                android:textColor="@color/_FFFFFF"
+                android:textSize="40sp" />
 
 
         </LinearLayout>
 
+
     </LinearLayout>
-
-
-
 
 
     <FrameLayout
         android:id="@+id/keyboard_layout"
-        android:layout_width="600dp"
-        android:layout_height="360dp"
+        android:layout_width="900dp"
+        android:layout_height="350dp"
         android:layout_gravity="bottom|center_horizontal"
-        android:layout_marginLeft="300dp"
         android:background="@color/_FFFFFF">
 
 
         <com.tianheng.client.wedget.NumberKeyboardView
             android:id="@+id/keyboard"
             android:layout_width="560dp"
-            android:layout_height="400dp"
+            android:layout_height="300dp"
             android:layout_gravity="center_horizontal|top" />
 
 
     </FrameLayout>
+
+
+    <TextView
+        android:id="@+id/imei"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="40dp"
+        android:layout_marginTop="40dp"
+        android:textColor="@color/_FFFFFF"
+        android:textSize="18sp" />
+
 
 </FrameLayout>

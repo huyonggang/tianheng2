@@ -27,11 +27,13 @@ import com.tianheng.client.broad.CabinetManager;
 import com.tianheng.client.global.Const;
 import com.tianheng.client.model.bean.BoxStatus;
 import com.tianheng.client.model.bean.ExchangeBean;
+import com.tianheng.client.model.bean.JPushBean;
 import com.tianheng.client.model.bean.OrderBean;
 import com.tianheng.client.model.bean.SubscribeBean;
 import com.tianheng.client.model.bean.UserBean;
 import com.tianheng.client.model.bean.UserMemberBean;
 import com.tianheng.client.model.event.DoorStatusEvent;
+import com.tianheng.client.model.event.JPushEvent;
 import com.tianheng.client.model.event.MemberEvent;
 import com.tianheng.client.model.event.OpenDoorEvent;
 import com.tianheng.client.model.frame.BMSFrame;
@@ -78,16 +80,6 @@ public class OperateFragment extends BaseFragment<OperatePresenter> implements O
     @BindView(R.id.user_qr_code)
     ImageView mQRCode;
 
-    @BindView(R.id.input_ver_code)
-    EditText mCode;
-    @BindView(R.id.get_code)
-    Button mGetCode;
-    @BindView(R.id.login)
-    Button mLogin;
-    @BindView(R.id.input_phone)
-    EditText mPhone;
-
-
     @BindView(R.id.exchange)
     Button mExchange;
     @BindView(R.id.input_code)
@@ -98,23 +90,16 @@ public class OperateFragment extends BaseFragment<OperatePresenter> implements O
     FrameLayout mKeyboardLayout;
     @BindView(R.id.input_title)
     TextView mIputTitle;
-    @BindView(R.id.tab_layout)
-    TabLayout mTabLayout;
-    @BindView(R.id.login_layout)
-    LinearLayout mLoginLayout;
     @BindView(R.id.subscribe_layout)
     LinearLayout mSubscribeLayout;
+    @BindView(R.id.imei)
+    TextView mImei;
 
 
-    @OnClick({R.id.exchange, R.id.login, R.id.get_code})
+    @OnClick({R.id.exchange})
     public void onClick(View view) {
         switch (view.getId()) {
-            case R.id.get_code:
-                getCode();
-                break;
-            case R.id.login:
-                login();
-                break;
+
             case R.id.exchange:
                 String code = mInputCode.getText().toString().trim();
                 if (TextUtils.isEmpty(code)) {
@@ -143,7 +128,6 @@ public class OperateFragment extends BaseFragment<OperatePresenter> implements O
     private Disposable disposable;
     private int deviceNo;
     private List<BoxStatus> boxStatuses = new ArrayList<>();
-    private int type;
 
 
     @Override
@@ -200,6 +184,7 @@ public class OperateFragment extends BaseFragment<OperatePresenter> implements O
 
     private void initData() {
         String imei = App.getInstance().getImei();
+        mImei.setText("电池柜编号:" + imei);
         mPresenter.getQRCode(imei, 200, 200, "png");
         boxStatuses.clear();
         for (int i = 0; i < 8; i++) {
@@ -212,43 +197,14 @@ public class OperateFragment extends BaseFragment<OperatePresenter> implements O
 
     public void schedule() {
         //定时上传数据
-        timer.schedule(task, 60 * 1000, 15 * 60 * 1000);
+        timer.schedule(task, 20 * 1000, 15 * 60 * 1000);
     }
 
     private void initView() {
         mKeyboardLayout.setVisibility(View.GONE);
         initEditText();
         initKeyboard();
-        initTab();
     }
-
-    private void initTab() {
-        mTabLayout.addTab(mTabLayout.newTab().setText("登录"));
-        mTabLayout.addTab(mTabLayout.newTab().setText("预约"));
-        mTabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
-            @Override
-            public void onTabSelected(TabLayout.Tab tab) {
-                if ("登录".equals(tab.getText())) {
-                    mLoginLayout.setVisibility(View.VISIBLE);
-                    mSubscribeLayout.setVisibility(View.GONE);
-                } else {
-                    mSubscribeLayout.setVisibility(View.VISIBLE);
-                    mLoginLayout.setVisibility(View.GONE);
-                }
-            }
-
-            @Override
-            public void onTabUnselected(TabLayout.Tab tab) {
-
-            }
-
-            @Override
-            public void onTabReselected(TabLayout.Tab tab) {
-
-            }
-        });
-    }
-
 
     @Override
     public void showContent(String message) {
@@ -257,10 +213,14 @@ public class OperateFragment extends BaseFragment<OperatePresenter> implements O
 
 
     @Subscribe
-    public void onEvent(MemberEvent event) {
-        UserMemberBean userMemberBean = event.memberBean;
-        App.getInstance().setTicket(userMemberBean.getTicket());
-        mPresenter.exchange();
+    public void onEvent(JPushEvent event) {
+        App.getInstance().setTicket(event.getTicket());
+        this.mExchangeBean = event.getExchangeBean();
+        sendCloseMessage();
+
+        sendShowMessage("正在打开箱门，请稍后...");
+        status = 1;
+        mCabinetManager.openDoor(0, mExchangeBean.getEmptyBoxNumber());
     }
 
     /**
@@ -273,10 +233,17 @@ public class OperateFragment extends BaseFragment<OperatePresenter> implements O
         boolean isOpen = event.isOpen;
         Log.d(TAG, "isOpen" + isOpen);
         if (!isOpen) {
-            if (status == 4 && event.iLockId == mExchangeBean.getEmptyBoxNumber()) {
+            if (status == 3 && event.iLockId == mExchangeBean.getEmptyBoxNumber()) {
+                sendCloseMessage();
+                sendShowMessage("箱门已关闭，正在检测电池");
                 if (disposable != null) {
                     disposable.dispose();
                 }
+            } else if (status == 4 && event.iLockId == mExchangeBean.getEmptyBoxNumber()) {
+                if (disposable != null) {
+                    disposable.dispose();
+                }
+                closeDialog();
                 mPresenter.closeOld(mExchangeBean.getLeaseBatteryNumber(), mExchangeBean.getEmptyBoxNumber());
             } else if (status == 2 && event.iLockId == mExchangeBean.getEmptyBoxNumber()) {
                 sendCloseMessage();
@@ -284,10 +251,13 @@ public class OperateFragment extends BaseFragment<OperatePresenter> implements O
                 if (disposable != null) {
                     disposable.dispose();
                 }
+                mPresenter.logout(App.getInstance().getTicket());
             } else if (status == 6 && event.iLockId == mExchangeBean.getExchangeBoxNumber()) {
-                sendShowMessage("请取出电池");
+                sendCloseMessage();
+                sendShowMessage("请取出电池,并关闭箱门");
                 mCabinetManager.openDoor(0, mExchangeBean.getExchangeBoxNumber());
             } else if (status == 7 && event.iLockId == mExchangeBean.getExchangeBoxNumber()) {
+                sendCloseMessage();
                 mPresenter.closeNew(mExchangeBean.getExchangeBoxNumber(), mExchangeBean.getExchangeBatteryNumber());
                 if (disposable != null) {
                     disposable.dispose();
@@ -296,7 +266,6 @@ public class OperateFragment extends BaseFragment<OperatePresenter> implements O
         } else {
 
         }
-
 
     }
 
@@ -311,6 +280,7 @@ public class OperateFragment extends BaseFragment<OperatePresenter> implements O
         if (isOpen) {
             Log.d(TAG, "status =" + status);
             if (status == 1 && event.iLockId == mExchangeBean.getEmptyBoxNumber()) {
+                sendCloseMessage();
                 sendShowMessage("请放入电池");
                 status = 2;
                 if (disposable == null || disposable.isDisposed()) {
@@ -326,6 +296,7 @@ public class OperateFragment extends BaseFragment<OperatePresenter> implements O
                 }
             } else if (status == 5 && event.iLockId == mExchangeBean.getExchangeBoxNumber()) {
                 status = 6;
+                sendCloseMessage();
                 sendShowMessage("请取出电池,并关闭箱门");
                 if (disposable == null || disposable.isDisposed()) {
                     disposable = Observable.interval(0, 5, TimeUnit.SECONDS)
@@ -348,14 +319,16 @@ public class OperateFragment extends BaseFragment<OperatePresenter> implements O
      *
      * @param batteryFrame
      */
-    @Subscribe
+    @Subscribe(threadMode = BACKGROUND)
     public void onEvent(BatteryFrame batteryFrame) {
         if (batteryFrame != null) {
             switch (batteryFrame.bms) {
                 //连接状态
                 case "00":
-                    if (Integer.parseInt(batteryFrame.device) == mExchangeBean.getEmptyBoxNumber() && status == 2) {
+                    if (status == 2 && Integer.parseInt(batteryFrame.device) == mExchangeBean.getEmptyBoxNumber()) {
                         status = 3;//电池插入成功
+                        sendCloseMessage();
+                        sendShowMessage("电池放入成功,请关闭箱门");
                         searchPackage(mExchangeBean.getEmptyBoxNumber());
                     }
                     BoxStatus boxStatus = boxStatuses.get(Integer.parseInt(batteryFrame.device));
@@ -369,9 +342,12 @@ public class OperateFragment extends BaseFragment<OperatePresenter> implements O
                 case "01":
                     if ((status == 4 || status == 3) && Integer.parseInt(batteryFrame.device) == mExchangeBean.getEmptyBoxNumber()) {//  //检测成功或正在检测后拔出
                         status = 2;
+                        sendCloseMessage();
                         sendShowMessage("请插入电池");
                     } else if (status == 6 && Integer.parseInt(batteryFrame.device) == mExchangeBean.getExchangeBoxNumber()) {
                         status = 7;
+                        sendCloseMessage();
+                        sendShowMessage("请关闭柜门");
                     }
                     BoxStatus boxStatus2 = boxStatuses.get(Integer.parseInt(batteryFrame.device));
                     if (!boxStatus2.getEmpty()) {
@@ -389,7 +365,7 @@ public class OperateFragment extends BaseFragment<OperatePresenter> implements O
      *
      * @param forwardFrame
      */
-    @Subscribe(threadMode = BACKGROUND)
+    @Subscribe()
     public void onEvent(ForwardFrame forwardFrame) {
         if (Integer.parseInt(forwardFrame.device) == deviceNo) {
             Log.d(TAG, "forwardFrame.data" + forwardFrame.data);
@@ -433,6 +409,7 @@ public class OperateFragment extends BaseFragment<OperatePresenter> implements O
     @Override
     public void openDoor(ExchangeBean exchangeBean) {
         this.mExchangeBean = exchangeBean;
+        sendCloseMessage();
         sendShowMessage("正在打开箱门，请稍后");
         status = 1;
         mCabinetManager.openDoor(0, mExchangeBean.getEmptyBoxNumber());
@@ -440,11 +417,15 @@ public class OperateFragment extends BaseFragment<OperatePresenter> implements O
 
 
     @Override
-    public void closeOldSuccess(OrderBean orderBean) {
+    public void closeOldSuccess() {
+        showContent("订单结算成功");
+        closeDialog();
         status = 5;
+        sendCloseMessage();
         sendShowMessage("打开柜门中...");
         mCabinetManager.openDoor(0, mExchangeBean.getExchangeBoxNumber());
     }
+
 
 
     @Override
@@ -452,12 +433,20 @@ public class OperateFragment extends BaseFragment<OperatePresenter> implements O
         status = -1;//完成操作
         ToastUtil.show(getActivity(), "完成交易", Toast.LENGTH_SHORT);
         sendCloseMessage();
+        mPresenter.logout(App.getInstance().getTicket());
     }
+
 
 
     @Override
     public void closeDialog() {
         sendCloseMessage();
+    }
+
+    @Override
+    public void showDialog(String message) {
+        sendCloseMessage();
+        sendShowMessage(message);
     }
 
 
@@ -474,10 +463,10 @@ public class OperateFragment extends BaseFragment<OperatePresenter> implements O
                         bmsFrame.pageNo = msg.arg1;
                         mListener.sendFrame(bmsFrame);//上传到服务器
                     }
-
                     if (status == 3 && bmsFrame != null && mExchangeBean != null && bmsFrame.pageNo == mExchangeBean.getEmptyBoxNumber()) {
                         if (CheckUtil.checkBattery(bmsFrame)) {
                             Log.d(TAG, "电池放入完成");
+                            sendCloseMessage();
                             sendShowMessage("电池检测成功");
                             status = 4;
                             if (disposable == null || disposable.isDisposed()) {
@@ -494,6 +483,7 @@ public class OperateFragment extends BaseFragment<OperatePresenter> implements O
 
                         } else {
                             status = 2;
+                            sendCloseMessage();
                             sendShowMessage("电池异常,请联系当地网点");
                         }
                     } else if (bmsFrame == null && status == 3) {
@@ -553,8 +543,6 @@ public class OperateFragment extends BaseFragment<OperatePresenter> implements O
             byte[] frame;
             frame = EncodeFrame.selectFirst(deviceNo);
             mListener.sendFrame(frame);
-            Thread.sleep(600);
-            mListener.sendFrame(frame);
             for (int i = 0; i < 9; i++) {
                 Thread.sleep(600);
                 frame = EncodeFrame.selectByPageNo(deviceNo, String.valueOf(i));
@@ -601,7 +589,7 @@ public class OperateFragment extends BaseFragment<OperatePresenter> implements O
     public void subscribeSuccess(SubscribeBean subscribeBean) {
         App.getInstance().setTicket(subscribeBean.getTicket());
         this.mExchangeBean = subscribeBean.getExchangeModel();
-
+        sendCloseMessage();
         sendShowMessage("正在打开箱门，请稍后...");
         status = 1;
         mCabinetManager.openDoor(0, mExchangeBean.getEmptyBoxNumber());
@@ -623,8 +611,6 @@ public class OperateFragment extends BaseFragment<OperatePresenter> implements O
                         boolean.class);
                 setShowSoftInputOnFocus.setAccessible(false);
                 setShowSoftInputOnFocus.invoke(mInputCode, false);
-                setShowSoftInputOnFocus.invoke(mPhone, false);
-                setShowSoftInputOnFocus.invoke(mCode, false);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -635,27 +621,6 @@ public class OperateFragment extends BaseFragment<OperatePresenter> implements O
             public void onFocusChange(View v, boolean hasFocus) {
                 if (hasFocus) {
                     //隐藏系统软键盘
-                    type = 2;
-                    mKeyboardLayout.setVisibility(View.VISIBLE);
-                }
-            }
-        });
-
-        mPhone.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View v, boolean hasFocus) {
-                if (hasFocus) {
-                    type = 0;
-                    mKeyboardLayout.setVisibility(View.VISIBLE);
-                }
-            }
-        });
-
-        mCode.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View v, boolean hasFocus) {
-                if (hasFocus) {
-                    type = 1;
                     mKeyboardLayout.setVisibility(View.VISIBLE);
                 }
             }
@@ -665,11 +630,7 @@ public class OperateFragment extends BaseFragment<OperatePresenter> implements O
 
     private void hindKeyboard() {
         mInputCode.clearFocus();
-        mPhone.clearFocus();
-        mCode.clearFocus();
-        mLogin.requestFocus();
         mInputCode.clearFocus();
-        mLogin.requestFocusFromTouch();
         mIputTitle.requestFocus();
         mIputTitle.requestFocusFromTouch();
         mKeyboardLayout.setVisibility(View.GONE);
@@ -679,50 +640,17 @@ public class OperateFragment extends BaseFragment<OperatePresenter> implements O
         mKeyboard.setOnNumberClickListener(new NumberKeyboardView.OnNumberClickListener() {
             @Override
             public void onNumberReturn(String number) {
-
-                switch (type) {
-                    case 0:
-                        setTextContent(mPhone.getText().toString() + number);
-                        break;
-                    case 1:
-                        setTextContent(mCode.getText().toString() + number);
-                        break;
-                    case 2:
-                        setTextContent(mInputCode.getText().toString() + number);
-                        break;
-                }
+                setTextContent(mInputCode.getText().toString() + number);
             }
 
             @Override
             public void onNumberDelete() {
 
-                switch (type) {
-                    case 0:
-                        int length = mPhone.getText().length();
-                        if (length <= 1) {
-                            setTextContent("");
-                        } else {
-                            setTextContent(mPhone.getText().toString().substring(0, length - 1));
-                        }
-
-                        break;
-                    case 1:
-                        int codeLength = mCode.getText().length();
-                        if (codeLength <= 1) {
-                            setTextContent("");
-                        } else {
-                            setTextContent(mCode.getText().toString().substring(0, codeLength - 1));
-                        }
-                        break;
-                    case 2:
-                        int inputCode = mInputCode.getText().length();
-                        if (inputCode <= 1) {
-                            setTextContent("");
-                        } else {
-                            setTextContent(mInputCode.getText().toString().substring(0, inputCode - 1));
-                        }
-
-                        break;
+                int inputCode = mInputCode.getText().length();
+                if (inputCode <= 1) {
+                    setTextContent("");
+                } else {
+                    setTextContent(mInputCode.getText().toString().substring(0, inputCode - 1));
                 }
             }
 
@@ -735,64 +663,8 @@ public class OperateFragment extends BaseFragment<OperatePresenter> implements O
     }
 
     private void setTextContent(String content) {
-        switch (type) {
-            case 0:
-                mPhone.setText(content);
-                mPhone.setSelection(content.length());
-                break;
-            case 1:
-                mCode.setText(content);
-                mCode.setSelection(content.length());
-                break;
-            case 2:
-                mInputCode.setText(content);
-                mInputCode.setSelection(content.length());
-                break;
-        }
+        mInputCode.setText(content);
+        mInputCode.setSelection(content.length());
 
     }
-
-
-    private void getCode() {
-        String phone = mPhone.getText().toString().trim();
-        if (!TextUtils.isEmpty(phone)) {
-            mPresenter.getCode(phone);
-            mGetCode.setClickable(false);
-            mTimer.start();
-        } else {
-            showContent("请输入手机号");
-        }
-    }
-
-
-    private void login() {
-        String phone = mPhone.getText().toString().trim();
-        String code = mCode.getText().toString().trim();
-        if (TextUtils.isEmpty(phone)) {
-            showContent("请输入手机号");
-            return;
-        }
-
-        if (TextUtils.isEmpty(code)) {
-            showContent("请输入验证码");
-            return;
-        }
-        mPresenter.login(phone, code);
-
-
-    }
-
-    private CountDownTimer mTimer = new CountDownTimer(60 * 1000, 1000) {
-        @Override
-        public void onTick(long millisUntilFinished) {
-            mGetCode.setText(millisUntilFinished / 1000 + "秒");
-        }
-
-        @Override
-        public void onFinish() {
-            mTimer.cancel();
-            mGetCode.setText("获取");
-            mGetCode.setClickable(true);
-        }
-    };
 }

@@ -8,8 +8,11 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.google.gson.Gson;
+import com.tianheng.client.model.bean.ExchangeBean;
+import com.tianheng.client.model.bean.JPushBean;
 import com.tianheng.client.model.bean.MemberBean;
 import com.tianheng.client.model.bean.UserMemberBean;
+import com.tianheng.client.model.event.JPushEvent;
 import com.tianheng.client.model.event.MemberEvent;
 
 import org.greenrobot.eventbus.EventBus;
@@ -47,11 +50,9 @@ public class JPushReceiver extends BroadcastReceiver {
             } else if (JPushInterface.ACTION_NOTIFICATION_RECEIVED.equals(intent.getAction())) {
                 String str = bundle.getString(JPushInterface.EXTRA_EXTRA);
                 Log.d(TAG, str);
-                UserMemberBean memberBean = new Gson().fromJson(str, UserMemberBean.class);
-                if (Integer.parseInt(memberBean.getCode()) == 2) {
-                    EventBus.getDefault().post(new MemberEvent(memberBean));
-                    Log.d(TAG, "POST");
-                }
+                JPushBean jPushBean = new Gson().fromJson(str, JPushBean.class);
+                ExchangeBean exchangeBean = new Gson().fromJson(jPushBean.getExchangeModel(), ExchangeBean.class);
+                EventBus.getDefault().post(new JPushEvent(exchangeBean, jPushBean.getTicket()));
             } else if (JPushInterface.ACTION_NOTIFICATION_OPENED.equals(intent.getAction())) {
                 Log.d(TAG, "[MyReceiver] 用户点击打开了通知");
 
@@ -67,7 +68,7 @@ public class JPushReceiver extends BroadcastReceiver {
                 Log.d(TAG, "[MyReceiver] Unhandled intent - " + intent.getAction());
             }
         } catch (Exception e) {
-            Log.d(TAG,e.getMessage());
+            Log.d(TAG, e.getMessage());
         }
 
     }
