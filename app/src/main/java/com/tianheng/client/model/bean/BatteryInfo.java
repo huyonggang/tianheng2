@@ -9,7 +9,7 @@ package com.tianheng.client.model.bean;
  "boxNumber": 1//电池所在的箱子编号
  "curPower": 60,//当前电量
  "curVoltage": 220,//当前电压
- "chargerStatus": 0//充电状态0未使用1充电中2放电中
+ "chargerStatus": 0//0未使用1充电中2放电中
  }
  */
 

@@ -209,7 +209,7 @@ public class OperatePresenter extends RxPresenter<OperateContract.View> implemen
 
     @Override
     public void subscribeCode(String code) {
-        Disposable disposable = mApiFactory.getOperateApi().subscribeCode(code)
+        Disposable disposable = mApiFactory.getOperateApi().subscribeCode(code,App.getInstance().getImei())
                 .compose(RxSchedulers.io_main())
                 .compose(RxResult.handleResult())
                 .doOnSubscribe(new Consumer<Disposable>() {

@@ -140,8 +140,6 @@ public class SClientManager {
             Log.e(TAG, "frame sent failed, channel is null, is the manager start?");
             return false;
         }
-        //2A 1C 02 01 00 00 00 00 00 00 00 00 89 92 38 04 00 6F 0D 00 0F AA FF 06 00 01 80 00 01 02 18 23
-        //42, 28, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, -119, -110, 56, 4, 0, 111, 13, 0, 15, -86, -1, 6, 0, 1, -128, 0, 1, 2, 24, 35
         lastWriteFuture = channel.writeAndFlush(frame);
         lastWriteFuture.addListener(new ChannelFutureListener() {
             @Override

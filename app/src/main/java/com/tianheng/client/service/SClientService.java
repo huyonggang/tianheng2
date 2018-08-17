@@ -94,7 +94,7 @@ public class SClientService extends Service {
         batteryInfo.setBoxNumber(boxNum);
         batteryInfo.setCurPower(0);
         batteryInfo.setCurVoltage(0);
-        batteryInfo.setChargerStatus(-1);
+        batteryInfo.setChargerStatus(2);
         String frame = new Gson().toJson(batteryInfo);
         SClientManager.getInstance().sendFrame(frame);
     }
@@ -124,12 +124,13 @@ public class SClientService extends Service {
         } else if ("0001".equals(statusStr)) {
             status = 0;
         } else {
-            status = 3;
+            status = 2;
         }
         return status;
     }
 
-//    public int resolveStatus(BMSFrame bmsFrame) {
+
+//  public int resolveStatus(BMSFrame bmsFrame) {
 //        int status = 0;
 //        String  statusStr = bmsFrame.status;
 //        if ("0000".equals(statusStr)) {
@@ -153,6 +154,7 @@ public class SClientService extends Service {
 //        }
 //        return status;
 //    }
+
 
     public double sumVol(BMSFrame bmsFrame) {
         double sum = 0;
@@ -178,5 +180,4 @@ public class SClientService extends Service {
         sum = sum / 1000.0;
         return sum;
     }
-
 }

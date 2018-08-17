@@ -29,6 +29,7 @@ import com.tianheng.client.base.BaseActivity;
 import com.tianheng.client.broad.CabinetManager;
 import com.tianheng.client.model.event.DoorErrorEvent;
 import com.tianheng.client.model.frame.BMSFrame;
+import com.tianheng.client.model.netty.SClientManager;
 import com.tianheng.client.presenter.HomePresenter;
 import com.tianheng.client.presenter.contract.HomeContract;
 import com.tianheng.client.service.SClientService;
@@ -45,9 +46,15 @@ import com.youth.banner.listener.OnBannerListener;
 import org.greenrobot.eventbus.Subscribe;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import butterknife.BindView;
 import cn.jpush.android.api.JPushInterface;
+import io.reactivex.Observable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Consumer;
+import io.reactivex.schedulers.Schedulers;
 
 /**
  * Created by huyg on 2017/12/25.
@@ -69,14 +76,13 @@ public class HomeActivity extends BaseActivity<HomePresenter> implements HomeCon
     private Intent mIntent = new Intent();
     private TextView mSubView;
     private TextView mTitleView;
-    private MyHandler mHander = new MyHandler();
     private List<String> images = null;
     private SerialPortService mPortService;
     private SClientService mClientService;
     private ShapeLoadingDialog mDialog;
     private ShapeLoadingDialog.Builder mBuilder;
     private CabinetManager mCabinetManager;
-
+    private Disposable disposable;
     @Override
     protected void initInject() {
         getActivityComponent().inject(this);
@@ -92,8 +98,6 @@ public class HomeActivity extends BaseActivity<HomePresenter> implements HomeCon
 
     @Override
     protected void init() {
-
-        mHander.sendEmptyMessageAtTime(0, 10 * 1000);
         initService();
         initData();
         initView();
@@ -122,7 +126,7 @@ public class HomeActivity extends BaseActivity<HomePresenter> implements HomeCon
     private void initService() {
         serviceIn.setClass(this, SClientService.class);
         portIn.setClass(this, SerialPortService.class);
-        bindService(portIn, mConnection, BIND_AUTO_CREATE);
+        //bindService(portIn, mConnection, BIND_AUTO_CREATE);
         bindService(serviceIn, mClientConn, BIND_AUTO_CREATE);
     }
 
@@ -231,23 +235,6 @@ public class HomeActivity extends BaseActivity<HomePresenter> implements HomeCon
     }
 
 
-    private class MyHandler extends Handler {
-        @Override
-        public void handleMessage(Message msg) {
-            super.handleMessage(msg);
-            switch (msg.what) {
-                case 0:
-                    if (TextUtils.isEmpty(App.getInstance().getTicket()) && images != null && images.size() > 0) {
-                        mBanner.setVisibility(View.VISIBLE);
-                    } else {
-
-                    }
-                    break;
-            }
-
-
-        }
-    }
 
     @Override
     public void showContent(String message) {
@@ -257,8 +244,9 @@ public class HomeActivity extends BaseActivity<HomePresenter> implements HomeCon
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        disposable.dispose();
         unbindService(mClientConn);
-        unbindService(mConnection);
+        //unbindService(mConnection);
     }
 
     @Override
@@ -268,6 +256,21 @@ public class HomeActivity extends BaseActivity<HomePresenter> implements HomeCon
             mBanner.setImages(images);
             mBanner.start();
         }
-    }
 
+        if (disposable == null || disposable.isDisposed()) {
+            disposable = Observable.interval(0, 20, TimeUnit.SECONDS)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(new Consumer<Long>() {
+                        @Override
+                        public void accept(Long aLong) throws Exception {
+                            if (TextUtils.isEmpty(App.getInstance().getTicket()) && images != null && images.size() > 0) {
+                                mBanner.setVisibility(View.VISIBLE);
+                            } else {
+
+                            }
+                        }
+                    });
+        }
+    }
 }
