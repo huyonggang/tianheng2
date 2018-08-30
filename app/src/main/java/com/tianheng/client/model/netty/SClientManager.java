@@ -4,15 +4,20 @@ import android.content.Context;
 import android.util.Log;
 
 
+import com.tianheng.client.global.Const;
+
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.ConnectException;
 import java.net.Socket;
+import java.util.concurrent.TimeUnit;
+
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ConnectTimeoutException;
+import io.netty.channel.EventLoop;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
@@ -145,9 +150,26 @@ public class SClientManager {
             @Override
             public void operationComplete(ChannelFuture future) throws Exception {
                 Log.wtf(TAG, "netty send operationComplete ");
+                if (!future.isSuccess()) {
+                    System.out.println("Reconnection");
+                    final EventLoop eventLoop = future.channel().eventLoop();
+                    eventLoop.schedule(new Runnable() {
+
+
+                        @Override
+                        public void run() {
+                            stopNetty();
+                            startNetty(Const.BASE_IP, Const.BASE_PORT);
+                        }
+                    }, 1L, TimeUnit.SECONDS);
+                }
+
             }
         });
         Log.e(TAG, "netty send -->" + frame);
         return true;
     }
+
+
+
 }

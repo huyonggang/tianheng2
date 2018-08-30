@@ -129,7 +129,6 @@ public class OperateFragment extends BaseFragment<OperatePresenter> implements O
     private int deviceNo;
     private List<BoxStatus> boxStatuses = new ArrayList<>();
 
-
     @Override
     protected void initInject() {
         getFragmentComponent().inject(this);
@@ -197,7 +196,7 @@ public class OperateFragment extends BaseFragment<OperatePresenter> implements O
 
     public void schedule() {
         //定时上传数据
-        timer.schedule(task, 10*1000, 5*60 * 1000);
+        timer.schedule(task, 10 * 1000, 5 * 60 * 1000);
     }
 
     private void initView() {
@@ -217,7 +216,6 @@ public class OperateFragment extends BaseFragment<OperatePresenter> implements O
         App.getInstance().setTicket(event.getTicket());
         this.mExchangeBean = event.getExchangeBean();
         sendCloseMessage();
-
         sendShowMessage("正在打开箱门，请稍后...");
         status = 1;
         mCabinetManager.openDoor(0, mExchangeBean.getEmptyBoxNumber());
@@ -247,7 +245,7 @@ public class OperateFragment extends BaseFragment<OperatePresenter> implements O
                 mPresenter.closeOld(mExchangeBean.getLeaseBatteryNumber(), mExchangeBean.getEmptyBoxNumber());
             } else if (status == 2 && event.iLockId == mExchangeBean.getEmptyBoxNumber()) {
                 try {
-                    Thread.sleep(3000);
+                    Thread.sleep(2000);
                     if (status == 2) {
                         sendCloseMessage();
                         status = -1;
@@ -305,7 +303,7 @@ public class OperateFragment extends BaseFragment<OperatePresenter> implements O
                 sendShowMessage("请放入电池");
                 status = 2;
                 if (disposable == null || disposable.isDisposed()) {
-                    disposable = Observable.interval(2, 5, TimeUnit.SECONDS)
+                    disposable = Observable.interval(2, 4, TimeUnit.SECONDS)
                             .subscribeOn(Schedulers.io())
                             .observeOn(AndroidSchedulers.mainThread())
                             .subscribe(new Consumer<Long>() {
@@ -320,12 +318,13 @@ public class OperateFragment extends BaseFragment<OperatePresenter> implements O
                 sendCloseMessage();
                 sendShowMessage("请取出电池,并关闭箱门");
                 if (disposable == null || disposable.isDisposed()) {
-                    disposable = Observable.interval(2, 5, TimeUnit.SECONDS)
+                    disposable = Observable.interval(2, 6, TimeUnit.SECONDS)
                             .subscribeOn(Schedulers.io())
                             .observeOn(AndroidSchedulers.mainThread())
                             .subscribe(new Consumer<Long>() {
                                 @Override
                                 public void accept(Long aLong) throws Exception {
+                                    //mListener.sendFrame(EncodeFrame.discharge());
                                     mCabinetManager.getDoorStatus(0, mExchangeBean.getExchangeBoxNumber());
                                 }
                             });
@@ -491,7 +490,7 @@ public class OperateFragment extends BaseFragment<OperatePresenter> implements O
                             sendShowMessage("电池检测成功");
                             status = 4;
                             if (disposable == null || disposable.isDisposed()) {
-                                disposable = Observable.interval(0, 5, TimeUnit.SECONDS)
+                                disposable = Observable.interval(0, 4, TimeUnit.SECONDS)
                                         .subscribeOn(Schedulers.io())
                                         .observeOn(AndroidSchedulers.mainThread())
                                         .subscribe(new Consumer<Long>() {

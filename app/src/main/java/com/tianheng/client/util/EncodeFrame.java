@@ -10,8 +10,14 @@ public class EncodeFrame {
         StringBuilder builder = new StringBuilder();
         builder.append("1801");
         builder.append(getDeviceNo(deviceNo));
-        builder.append("7806181E18340001");
+        builder.append("78061810005A0001");
         return DataUtils.HexString2Bytes(builder.toString());
+    }
+
+    //解锁放电
+    public static byte[] discharge(){
+        String frame = "78061810005A";
+        return DataUtils.HexString2Bytes(frame);
     }
 
     public static String getDeviceNo(int deviceNo) {
