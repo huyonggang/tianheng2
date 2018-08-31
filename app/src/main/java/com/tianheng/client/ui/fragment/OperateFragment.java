@@ -282,7 +282,7 @@ public class OperateFragment extends BaseFragment<OperatePresenter> implements O
                 Log.d(TAG, "请放入电池    " + status);
                 status = 2;
                 if (disposable == null || disposable.isDisposed()) {
-                    disposable = Observable.interval(2, 4, TimeUnit.SECONDS)
+                    disposable = Observable.interval(6, 5, TimeUnit.SECONDS)
                             .subscribeOn(Schedulers.io())
                             .observeOn(AndroidSchedulers.mainThread())
                             .subscribe(new Consumer<Long>() {
