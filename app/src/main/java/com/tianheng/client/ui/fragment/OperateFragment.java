@@ -313,19 +313,7 @@ public class OperateFragment extends BaseFragment<OperatePresenter> implements O
                 Log.d(TAG, "打开新柜门  " + status);
                 sendCloseMessage();
                 sendShowMessage("请取出电池,并关闭箱门");
-                if (disposable == null || disposable.isDisposed()) {
-                    disposable = Observable.interval(2, 6, TimeUnit.SECONDS)
-                            .subscribeOn(Schedulers.io())
-                            .observeOn(AndroidSchedulers.mainThread())
-                            .subscribe(new Consumer<Long>() {
-                                @Override
-                                public void accept(Long aLong) throws Exception {
-                                    //mListener.sendFrame(EncodeFrame.discharge());
-                                    Log.d(TAG,"getDoorStatus    "+status);
-                                    mCabinetManager.getDoorStatus(3, mExchangeBean.getExchangeBoxNumber());
-                                }
-                            });
-                }
+
 
             }
         }
@@ -367,6 +355,19 @@ public class OperateFragment extends BaseFragment<OperatePresenter> implements O
                         status = 7;
                         sendCloseMessage();
                         sendShowMessage("请关闭柜门");
+                        if (disposable == null || disposable.isDisposed()) {
+                            disposable = Observable.interval(0, 4, TimeUnit.SECONDS)
+                                    .subscribeOn(Schedulers.io())
+                                    .observeOn(AndroidSchedulers.mainThread())
+                                    .subscribe(new Consumer<Long>() {
+                                        @Override
+                                        public void accept(Long aLong) throws Exception {
+                                            //mListener.sendFrame(EncodeFrame.discharge());
+                                            Log.d(TAG,"getDoorStatus    "+status);
+                                            mCabinetManager.getDoorStatus(0, mExchangeBean.getExchangeBoxNumber());
+                                        }
+                                    });
+                        }
                     }
                     BoxStatus boxStatus2 = boxStatuses.get(Integer.parseInt(batteryFrame.device));
                     if (!boxStatus2.getEmpty()) {
