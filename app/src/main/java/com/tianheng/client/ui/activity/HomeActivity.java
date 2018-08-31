@@ -46,6 +46,7 @@ import com.youth.banner.listener.OnBannerListener;
 
 import org.greenrobot.eventbus.Subscribe;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -77,7 +78,7 @@ public class HomeActivity extends BaseActivity<HomePresenter> implements HomeCon
     private Intent mIntent = new Intent();
     private TextView mSubView;
     private TextView mTitleView;
-    private List<String> images = null;
+    private List<String> images =new ArrayList<>();
     private SerialPortService mPortService;
     private SClientService mClientService;
     private ShapeLoadingDialog mDialog;
@@ -252,11 +253,11 @@ public class HomeActivity extends BaseActivity<HomePresenter> implements HomeCon
 
     @Override
     public void showImage(List<AdBean> adBeans) {
-        if (images.size() > 0 && TextUtils.isEmpty(App.getInstance().getTicket())) {
+        if (adBeans.size() > 0 && TextUtils.isEmpty(App.getInstance().getTicket())) {
             for (AdBean adBean : adBeans) {
-                this.images.add(adBean.getImgUrl());
+                images.add(adBean.getImgUrl());
             }
-            mBanner.setImages(this.images);
+            mBanner.setImages(images);
             mBanner.start();
         }
 
@@ -267,7 +268,7 @@ public class HomeActivity extends BaseActivity<HomePresenter> implements HomeCon
                     .subscribe(new Consumer<Long>() {
                         @Override
                         public void accept(Long aLong) throws Exception {
-                            if (TextUtils.isEmpty(App.getInstance().getTicket()) && images != null && images.size() > 0) {
+                            if (TextUtils.isEmpty(App.getInstance().getTicket()) && adBeans != null && adBeans.size() > 0) {
                                 mBanner.setVisibility(View.VISIBLE);
                             } else {
 
