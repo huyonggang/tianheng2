@@ -46,6 +46,7 @@ import com.youth.banner.listener.OnBannerListener;
 
 import org.greenrobot.eventbus.Subscribe;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -77,7 +78,7 @@ public class HomeActivity extends BaseActivity<HomePresenter> implements HomeCon
     private Intent mIntent = new Intent();
     private TextView mSubView;
     private TextView mTitleView;
-    private List<String> images = null;
+    private List<String> images = new ArrayList<>();
     private SerialPortService mPortService;
     private SClientService mClientService;
     private ShapeLoadingDialog mDialog;
@@ -186,7 +187,7 @@ public class HomeActivity extends BaseActivity<HomePresenter> implements HomeCon
         //设置自动轮播，默认为true
         mBanner.isAutoPlay(true);
         //设置轮播时间
-        mBanner.setDelayTime(2 * 1000);
+        mBanner.setDelayTime(5 * 1000);
         //设置指示器位置（当banner模式中有指示器时）
         mBanner.setIndicatorGravity(BannerConfig.RIGHT);
         mBanner.setBannerStyle(BannerConfig.CIRCLE_INDICATOR);
@@ -245,18 +246,21 @@ public class HomeActivity extends BaseActivity<HomePresenter> implements HomeCon
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        disposable.dispose();
+        if (disposable!=null){
+            disposable.dispose();
+        }
+
         unbindService(mClientConn);
         unbindService(mConnection);
     }
 
     @Override
     public void showImage(List<AdBean> adBeans) {
-        if (images.size() > 0 && TextUtils.isEmpty(App.getInstance().getTicket())) {
+        if (adBeans.size() > 0 && TextUtils.isEmpty(App.getInstance().getTicket())) {
             for (AdBean adBean : adBeans) {
-                this.images.add(adBean.getImgUrl());
+                images.add(adBean.getImgUrl());
             }
-            mBanner.setImages(this.images);
+            mBanner.setImages(images);
             mBanner.start();
         }
 
@@ -267,7 +271,7 @@ public class HomeActivity extends BaseActivity<HomePresenter> implements HomeCon
                     .subscribe(new Consumer<Long>() {
                         @Override
                         public void accept(Long aLong) throws Exception {
-                            if (TextUtils.isEmpty(App.getInstance().getTicket()) && images != null && images.size() > 0) {
+                            if (TextUtils.isEmpty(App.getInstance().getTicket()) && adBeans != null && adBeans.size() > 0) {
                                 mBanner.setVisibility(View.VISIBLE);
                             } else {
 
