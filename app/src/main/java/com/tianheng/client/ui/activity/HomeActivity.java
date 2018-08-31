@@ -27,6 +27,7 @@ import com.tianheng.client.App;
 import com.tianheng.client.R;
 import com.tianheng.client.base.BaseActivity;
 import com.tianheng.client.broad.CabinetManager;
+import com.tianheng.client.model.bean.AdBean;
 import com.tianheng.client.model.event.DoorErrorEvent;
 import com.tianheng.client.model.frame.BMSFrame;
 import com.tianheng.client.model.netty.SClientManager;
@@ -83,6 +84,7 @@ public class HomeActivity extends BaseActivity<HomePresenter> implements HomeCon
     private ShapeLoadingDialog.Builder mBuilder;
     private CabinetManager mCabinetManager;
     private Disposable disposable;
+
     @Override
     protected void initInject() {
         getActivityComponent().inject(this);
@@ -235,7 +237,6 @@ public class HomeActivity extends BaseActivity<HomePresenter> implements HomeCon
     }
 
 
-
     @Override
     public void showContent(String message) {
         ToastUtil.showShort(this, message);
@@ -250,10 +251,12 @@ public class HomeActivity extends BaseActivity<HomePresenter> implements HomeCon
     }
 
     @Override
-    public void showImage(List<String> images) {
+    public void showImage(List<AdBean> adBeans) {
         if (images.size() > 0 && TextUtils.isEmpty(App.getInstance().getTicket())) {
-            this.images = images;
-            mBanner.setImages(images);
+            for (AdBean adBean : adBeans) {
+                this.images.add(adBean.getImgUrl());
+            }
+            mBanner.setImages(this.images);
             mBanner.start();
         }
 
