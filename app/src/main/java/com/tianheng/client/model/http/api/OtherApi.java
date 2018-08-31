@@ -6,6 +6,7 @@ import java.util.List;
 import io.reactivex.Observable;
 import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
+import retrofit2.http.GET;
 import retrofit2.http.POST;
 
 /**
@@ -15,9 +16,8 @@ import retrofit2.http.POST;
 public interface OtherApi {
 
 
-    @FormUrlEncoded
-    @POST("cabinet/images")
-    Observable<HttpResponse<List<String>>> getBannerImages(@Field("size") int size);
+    @GET("ad/list")
+    Observable<HttpResponse<List<String>>> getBannerImages();
 
 
 

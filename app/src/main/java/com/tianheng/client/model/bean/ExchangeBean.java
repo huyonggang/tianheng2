@@ -45,4 +45,9 @@ public class ExchangeBean {
     public void setExchangeBatteryNumber(String exchangeBatteryNumber) {
         this.exchangeBatteryNumber = exchangeBatteryNumber;
     }
+
+    @Override
+    public String toString() {
+        return leaseBatteryNumber+"     "+emptyBoxNumber+"      "+exchangeBoxNumber+"    "   +exchangeBatteryNumber;
+    }
 }
