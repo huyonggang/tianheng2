@@ -296,7 +296,7 @@ public class OperateFragment extends BaseFragment<OperatePresenter> implements O
                         sendCloseMessage();
                         sendShowMessage("电池放入成功,请关闭箱门");
                         if (disposable == null || disposable.isDisposed()) {
-                            disposable = Observable.interval(0, 5, TimeUnit.SECONDS)
+                            disposable = Observable.interval(0, 4, TimeUnit.SECONDS)
                                     .subscribeOn(Schedulers.io())
                                     .observeOn(AndroidSchedulers.mainThread())
                                     .subscribe(new Consumer<Long>() {
@@ -307,7 +307,6 @@ public class OperateFragment extends BaseFragment<OperatePresenter> implements O
                                         }
                                     });
                         }
-
                         searchPackage(mExchangeBean.getEmptyBoxNumber());
                     }
                     BoxStatus boxStatus = boxStatuses.get(Integer.parseInt(batteryFrame.device));

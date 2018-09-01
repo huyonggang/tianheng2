@@ -187,7 +187,7 @@ public class HomeActivity extends BaseActivity<HomePresenter> implements HomeCon
         //设置自动轮播，默认为true
         mBanner.isAutoPlay(true);
         //设置轮播时间
-        mBanner.setDelayTime(2 * 1000);
+        mBanner.setDelayTime(5 * 1000);
         //设置指示器位置（当banner模式中有指示器时）
         mBanner.setIndicatorGravity(BannerConfig.RIGHT);
         mBanner.setBannerStyle(BannerConfig.CIRCLE_INDICATOR);
@@ -246,7 +246,10 @@ public class HomeActivity extends BaseActivity<HomePresenter> implements HomeCon
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        disposable.dispose();
+        if (disposable!=null){
+            disposable.dispose();
+        }
+
         unbindService(mClientConn);
         unbindService(mConnection);
     }
