@@ -208,8 +208,14 @@ public class OperateFragment extends BaseFragment<OperatePresenter> implements O
         sendShowMessage("正在打开箱门，请稍后...");
         Log.d(TAG, "正在打开箱门    " + status);
         Log.d(TAG, "正在打开箱门    " + mExchangeBean.toString());
-        status = 1;
-        mCabinetManager.openDoor(0, mExchangeBean.getEmptyBoxNumber());
+        if (mExchangeBean.getEmptyBoxNumber() == -1) {
+            status = 5;
+            mCabinetManager.openDoor(0, mExchangeBean.getExchangeBoxNumber());
+        } else {
+            status = 1;
+            mCabinetManager.openDoor(0, mExchangeBean.getEmptyBoxNumber());
+        }
+
     }
 
     /**
@@ -235,20 +241,6 @@ public class OperateFragment extends BaseFragment<OperatePresenter> implements O
                 closeDialog();
                 mPresenter.closeOld(mExchangeBean.getLeaseBatteryNumber(), mExchangeBean.getEmptyBoxNumber());
             } else if (status == 2 && event.iLockId == mExchangeBean.getEmptyBoxNumber()) {
-//                try {
-//                    Thread.sleep(2000);
-//                    Log.d(TAG, "空门关闭    " + status);
-//                    if (status == 2) {
-//                        sendCloseMessage();
-//                        status = -1;
-//                        if (disposable != null) {
-//                            disposable.dispose();
-//                        }
-//                        mPresenter.logout(App.getInstance().getTicket());
-//                    }
-//                } catch (InterruptedException e) {
-//                    e.printStackTrace();
-//                }
 
             } else if (status == 6 && event.iLockId == mExchangeBean.getExchangeBoxNumber()) {
 
@@ -287,8 +279,6 @@ public class OperateFragment extends BaseFragment<OperatePresenter> implements O
                 Log.d(TAG, "打开新柜门  " + status);
                 sendCloseMessage();
                 sendShowMessage("请取出电池,并关闭箱门");
-
-
             }
         }
     }
@@ -379,15 +369,6 @@ public class OperateFragment extends BaseFragment<OperatePresenter> implements O
                 int frameL = Integer.parseInt(length, 16);
                 sum = (int) Math.ceil(frameL / 7.0);
                 residue = frameL % 7;
-                if (residue == 0) {
-                    if (status != -1) {
-                        sendShowMessage("电池检测失败!,请重新插入");
-                        mCabinetManager.openDoor(0, mExchangeBean.getEmptyBoxNumber());
-                    } else {
-                        ToastUtil.show(mContext, "电池异常" + deviceNo, Toast.LENGTH_SHORT);
-                    }
-
-                }
             }
             String packNo = Integer.toHexString(sum - 1);
             if (packNo.length() == 1) {

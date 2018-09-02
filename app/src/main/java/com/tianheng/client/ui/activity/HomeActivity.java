@@ -78,7 +78,7 @@ public class HomeActivity extends BaseActivity<HomePresenter> implements HomeCon
     private Intent mIntent = new Intent();
     private TextView mSubView;
     private TextView mTitleView;
-    private List<String> images = new ArrayList<>();
+    private List<String> images =new ArrayList<>();
     private SerialPortService mPortService;
     private SClientService mClientService;
     private ShapeLoadingDialog mDialog;
