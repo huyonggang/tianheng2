@@ -150,19 +150,17 @@ public class SClientManager {
             @Override
             public void operationComplete(ChannelFuture future) throws Exception {
                 Log.wtf(TAG, "netty send operationComplete ");
-                if (!future.isSuccess()) {
-                    System.out.println("Reconnection");
-                    final EventLoop eventLoop = future.channel().eventLoop();
-                    eventLoop.schedule(new Runnable() {
-
-
-                        @Override
-                        public void run() {
-                            stopNetty();
-                            startNetty(Const.BASE_IP, Const.BASE_PORT);
-                        }
-                    }, 1L, TimeUnit.SECONDS);
-                }
+//                if (!future.isSuccess()) {
+//                    System.out.println("Reconnection");
+//                    final EventLoop eventLoop = future.channel().eventLoop();
+//                    eventLoop.schedule(new Runnable() {
+//                        @Override
+//                        public void run() {
+//                            stopNetty();
+//                            startNetty(Const.BASE_IP, Const.BASE_PORT);
+//                        }
+//                    }, 1L, TimeUnit.SECONDS);
+//                }
 
             }
         });
