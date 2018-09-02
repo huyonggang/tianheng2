@@ -36,7 +36,7 @@ public class Const {
 
 
     public static final String FRAME_80 = "80";
-    public static final String FRAME_78 = "78";
+    public static final String FRAME_78 = "783C";
 
     public static final int LOW_VOLTAGE = 2700;
     public static final int HEIGHT_VOLTAGE = 4300;
