@@ -1,5 +1,6 @@
 package com.tianheng.client;
 
+import android.app.Activity;
 import android.support.multidex.MultiDexApplication;
 
 import com.facebook.stetho.Stetho;
@@ -8,6 +9,10 @@ import com.tencent.bugly.crashreport.CrashReport;
 import com.tianheng.client.model.di.componet.AppComponent;
 import com.tianheng.client.model.di.componet.DaggerAppComponent;
 import com.tianheng.client.model.di.module.AppModule;
+import com.tianheng.client.util.excep.UnCeHandler;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import cn.jpush.android.api.JPushInterface;
 
@@ -19,7 +24,7 @@ public class App extends MultiDexApplication{
 
     private static App instance;
     private String param = "appid=5a62ff77";
-
+    List<Activity> list = new ArrayList<Activity>();
     public static synchronized App getInstance() {
         return instance;
     }
@@ -37,6 +42,7 @@ public class App extends MultiDexApplication{
      */
     private AppComponent mAppComponent;
 
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -50,6 +56,8 @@ public class App extends MultiDexApplication{
          //JPushInterface.init(this);     		// 初始化 JPush
         SpeechUtility.createUtility(this,param);
         initCrash();
+        UnCeHandler catchExcep = new UnCeHandler(this);
+        Thread.setDefaultUncaughtExceptionHandler(catchExcep);
     }
 
     private void initCrash() {
@@ -98,4 +106,23 @@ public class App extends MultiDexApplication{
     public void setRoot(boolean root) {
         isRoot = root;
     }
+
+    /**
+     * 向Activity列表中添加Activity对象*/
+    public void addActivity(Activity a){
+        list.add(a);
+    }
+
+    /**
+     * 关闭Activity列表中的所有Activity*/
+    public void finishActivity(){
+        for (Activity activity : list) {
+            if (null != activity) {
+                activity.finish();
+            }
+        }
+        //杀死该应用进程
+        android.os.Process.killProcess(android.os.Process.myPid());
+    }
+
 }

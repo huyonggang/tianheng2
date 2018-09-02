@@ -212,7 +212,6 @@ public class OperateFragment extends BaseFragment<OperatePresenter> implements O
             status = 5;
             mCabinetManager.openDoor(0, mExchangeBean.getExchangeBoxNumber());
         } else {
-
             status = 1;
             mCabinetManager.openDoor(0, mExchangeBean.getEmptyBoxNumber());
         }
