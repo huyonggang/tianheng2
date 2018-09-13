@@ -2,6 +2,7 @@ package com.tianheng.client.broad;
 
 import android.content.Context;
 import android.content.Intent;
+import android.util.Log;
 
 import com.tianheng.client.global.Const;
 
@@ -60,6 +61,7 @@ public class CabinetManager {
         mIntent.setAction(Const.REQ_GOODS_STATUS);
         mIntent.putExtra(BOARD_ID,iBoardId);
         mIntent.putExtra(LOCK_ID,iLockId);
+        Log.d("CabinetBroadcast",Const.REQ_GOODS_STATUS);
         sendBroadcast();
     }
 
@@ -71,6 +73,7 @@ public class CabinetManager {
         mIntent.setAction(Const.REQ_GOODSES_STATUS);
         mIntent.putExtra(BOARD_ID,iBoardId);
         mIntent.putExtra(BOXESCOUNTS,8);
+
         sendBroadcast();
     }
 }

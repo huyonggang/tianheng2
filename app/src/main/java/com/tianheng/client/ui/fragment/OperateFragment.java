@@ -332,8 +332,10 @@ public class OperateFragment extends BaseFragment<OperatePresenter> implements O
      */
     @Subscribe
     public void onEvent(GoodStatusEvent event) {
+
         int lockId = event.iLockId;
         boolean isGoods = event.isGoods;
+        Log.d(TAG, "lockId    " + lockId+"     isGoods"+isGoods);
         if (isGoods) {//有物体
             if (status == 2 && lockId == mExchangeBean.getEmptyBoxNumber()) {
                 sendCloseMessage();

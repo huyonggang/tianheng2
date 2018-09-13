@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 
 import com.tianheng.client.global.Const;
 import com.tianheng.client.model.event.DoorErrorEvent;
@@ -30,11 +31,13 @@ public class CabinetBroadcastReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         String action = intent.getAction();
+        Log.d("CabinetBroadcast",action);
         int errorCode = intent.getIntExtra("iErrorCode", -1);
         boolean isOpen = intent.getBooleanExtra("bOpend", false);
         boolean isGoods = intent.getBooleanExtra("bGoods", false);
         int iLockId = intent.getIntExtra("iLockId", -1);
         int iBoardId = intent.getIntExtra("iBoardId", -1);
+        Log.d("CabinetBroadcast",action+"     errorCode"+errorCode+"     isOpen"+isOpen+"    isGoods"+isGoods+"    iLockId"+iLockId);
         Bundle bundle = intent.getExtras();
         if (bundle != null) {
             goodsStatus = bundle.getIntegerArrayList("iGoodsArray");
