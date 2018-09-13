@@ -250,14 +250,38 @@ public class OperateFragment extends BaseFragment<OperatePresenter> implements O
                 }
                 Log.d(TAG, "箱门关闭    " + status);
                 Log.d(TAG, "getGoodsStatus    " + status);
-                mCabinetManager.getGoodStatus(0, mExchangeBean.getEmptyBoxNumber());
+                if (disposable == null || disposable.isDisposed()) {
+                    disposable = Observable.timer(4, TimeUnit.SECONDS)
+                            .subscribeOn(Schedulers.io())
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .subscribe(new Consumer<Long>() {
+                                @Override
+                                public void accept(Long aLong) throws Exception {
+                                    Log.d(TAG, "getDoorStatus    " + status);
+                                    mCabinetManager.getGoodStatus(0, mExchangeBean.getEmptyBoxNumber());
+                                }
+                            });
+                }
+
 
             } else if (status == 6 && event.iLockId == mExchangeBean.getExchangeBoxNumber()) {
                 if (disposable != null) {
                     disposable.dispose();
                 }
                 Log.d(TAG, "getGoodsStatus    " + status);
-                mCabinetManager.getGoodStatus(0, mExchangeBean.getExchangeBoxNumber());
+                if (disposable == null || disposable.isDisposed()) {
+                    disposable = Observable.timer(4, TimeUnit.SECONDS)
+                            .subscribeOn(Schedulers.io())
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .subscribe(new Consumer<Long>() {
+                                @Override
+                                public void accept(Long aLong) throws Exception {
+                                    Log.d(TAG, "getDoorStatus    " + status);
+                                    mCabinetManager.getGoodStatus(0, mExchangeBean.getExchangeBoxNumber());
+                                }
+                            });
+                }
+
             } else if (status == 7 && event.iLockId == mExchangeBean.getExchangeBoxNumber()) {
 
                 if (disposable != null) {
@@ -332,10 +356,12 @@ public class OperateFragment extends BaseFragment<OperatePresenter> implements O
      */
     @Subscribe
     public void onEvent(GoodStatusEvent event) {
-
+        if (disposable != null) {
+            disposable.dispose();
+        }
         int lockId = event.iLockId;
         boolean isGoods = event.isGoods;
-        Log.d(TAG, "lockId    " + lockId+"     isGoods"+isGoods);
+        Log.d(TAG, "lockId    " + lockId + "     isGoods" + isGoods);
         if (isGoods) {//有物体
             if (status == 2 && lockId == mExchangeBean.getEmptyBoxNumber()) {
                 sendCloseMessage();
