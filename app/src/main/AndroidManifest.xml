@@ -81,6 +81,7 @@
                 <action android:name="com.hzjubu.action.ACK_DOOR_STATUS" />
                 <action android:name="com.hzjubu.action.ACK_DOORS_STATUS" />
                 <action android:name="com.hzjubu.action.ACK_OPEN_DOOR" />
+                <action android:name="com.hzjubu.action.ACK_GOODS_STATUS"/>
             </intent-filter>
         </receiver>
 
