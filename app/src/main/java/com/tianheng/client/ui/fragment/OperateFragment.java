@@ -25,6 +25,7 @@ import com.tianheng.client.model.bean.ExchangeBean;
 import com.tianheng.client.model.bean.SubscribeBean;
 import com.tianheng.client.model.bean.UserBean;
 import com.tianheng.client.model.event.DoorStatusEvent;
+import com.tianheng.client.model.event.GoodStatusEvent;
 import com.tianheng.client.model.event.JPushEvent;
 import com.tianheng.client.model.event.OpenDoorEvent;
 import com.tianheng.client.model.frame.BMSFrame;
@@ -42,6 +43,7 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
 import java.lang.reflect.Method;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
@@ -69,7 +71,6 @@ public class OperateFragment extends BaseFragment<OperatePresenter> implements O
 
     @BindView(R.id.user_qr_code)
     ImageView mQRCode;
-
     @BindView(R.id.exchange)
     Button mExchange;
     @BindView(R.id.input_code)
@@ -108,7 +109,7 @@ public class OperateFragment extends BaseFragment<OperatePresenter> implements O
     private static final String TAG = "OperateFragment";
 
     private OperateListener mListener;
-    private StringBuilder frameBuilder = new StringBuilder();//查询帧
+    private StringBuilder frameBuilder = new StringBuilder(); //查询帧
     private int residue;//最后一包有几位是需要的数据
     private int sum;//总包数
     private MyHandler mHandler = new MyHandler();
@@ -117,6 +118,7 @@ public class OperateFragment extends BaseFragment<OperatePresenter> implements O
     private Disposable disposable;
     private int deviceNo;
     private List<BoxStatus> boxStatuses = new ArrayList<>();
+
 
     @Override
     protected void initInject() {
@@ -138,6 +140,7 @@ public class OperateFragment extends BaseFragment<OperatePresenter> implements O
         super.onAttach(context);
         mListener = (OperateListener) context;
     }
+
 
     @Override
     public void onStart() {
@@ -172,7 +175,7 @@ public class OperateFragment extends BaseFragment<OperatePresenter> implements O
 
     private void initData() {
         String imei = App.getInstance().getImei();
-        mImei.setText("电池柜编号:" + imei);
+        mImei.setText(MessageFormat.format("电池柜编号:{0}", imei));
         mPresenter.getQRCode(imei, 200, 200, "png");
         boxStatuses.clear();
         for (int i = 0; i < 8; i++) {
@@ -185,7 +188,7 @@ public class OperateFragment extends BaseFragment<OperatePresenter> implements O
 
     public void schedule() {
         //定时上传数据
-        timer.schedule(task, 10 * 1000, 2 * 60 * 1000);
+        timer.schedule(task, 10 * 1000, 5 * 60 * 1000);
     }
 
     private void initView() {
@@ -208,6 +211,7 @@ public class OperateFragment extends BaseFragment<OperatePresenter> implements O
         sendShowMessage("正在打开箱门，请稍后...");
         Log.d(TAG, "正在打开箱门    " + status);
         Log.d(TAG, "正在打开箱门    " + mExchangeBean.toString());
+        mQRCode.setVisibility(View.GONE);
         if (mExchangeBean.getEmptyBoxNumber() == -1) {
             status = 5;
             mCabinetManager.openDoor(0, mExchangeBean.getExchangeBoxNumber());
@@ -241,10 +245,24 @@ public class OperateFragment extends BaseFragment<OperatePresenter> implements O
                 closeDialog();
                 mPresenter.closeOld(mExchangeBean.getLeaseBatteryNumber(), mExchangeBean.getEmptyBoxNumber());
             } else if (status == 2 && event.iLockId == mExchangeBean.getEmptyBoxNumber()) {
+                if (disposable != null) {
+                    disposable.dispose();
+                }
+                Log.d(TAG, "箱门关闭    " + status);
+                Log.d(TAG, "getGoodsStatus    " + status);
+                mCabinetManager.getGoodStatus(0, mExchangeBean.getEmptyBoxNumber());
 
             } else if (status == 6 && event.iLockId == mExchangeBean.getExchangeBoxNumber()) {
-
+                if (disposable != null) {
+                    disposable.dispose();
+                }
+                Log.d(TAG, "getGoodsStatus    " + status);
+                mCabinetManager.getGoodStatus(0, mExchangeBean.getExchangeBoxNumber());
             } else if (status == 7 && event.iLockId == mExchangeBean.getExchangeBoxNumber()) {
+
+                if (disposable != null) {
+                    disposable.dispose();
+                }
                 sendCloseMessage();
                 Log.d(TAG, "关闭箱门    " + status);
                 mPresenter.closeNew(mExchangeBean.getExchangeBoxNumber(), mExchangeBean.getExchangeBatteryNumber());
@@ -273,12 +291,67 @@ public class OperateFragment extends BaseFragment<OperatePresenter> implements O
                 sendShowMessage("请放入电池");
                 Log.d(TAG, "请放入电池    " + status);
                 status = 2;
-
+                Log.d(TAG, "getDoorStatus    " + status);
+                if (disposable == null || disposable.isDisposed()) {
+                    disposable = Observable.interval(4, 4, TimeUnit.SECONDS)
+                            .subscribeOn(Schedulers.io())
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .subscribe(new Consumer<Long>() {
+                                @Override
+                                public void accept(Long aLong) throws Exception {
+                                    Log.d(TAG, "getDoorStatus    " + status);
+                                    mCabinetManager.getDoorStatus(0, mExchangeBean.getEmptyBoxNumber());
+                                }
+                            });
+                }
             } else if (status == 5 && event.iLockId == mExchangeBean.getExchangeBoxNumber()) {
                 status = 6;
                 Log.d(TAG, "打开新柜门  " + status);
                 sendCloseMessage();
                 sendShowMessage("请取出电池,并关闭箱门");
+                if (disposable == null || disposable.isDisposed()) {
+                    disposable = Observable.interval(4, 4, TimeUnit.SECONDS)
+                            .subscribeOn(Schedulers.io())
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .subscribe(new Consumer<Long>() {
+                                @Override
+                                public void accept(Long aLong) throws Exception {
+                                    Log.d(TAG, "getDoorStatus    " + status);
+                                    mCabinetManager.getDoorStatus(0, mExchangeBean.getExchangeBoxNumber());
+                                }
+                            });
+                }
+            }
+        }
+    }
+
+    /**
+     * 物检状态返回
+     *
+     * @param event
+     */
+    @Subscribe
+    public void onEvent(GoodStatusEvent event) {
+        int lockId = event.iLockId;
+        boolean isGoods = event.isGoods;
+        if (isGoods) {//有物体
+            if (status == 2 && lockId == mExchangeBean.getEmptyBoxNumber()) {
+                sendCloseMessage();
+                sendShowMessage("请重新插入电池");
+                status = 1;
+                Log.d(TAG, "重新插入电池    " + status);
+                mCabinetManager.openDoor(0, mExchangeBean.getEmptyBoxNumber());
+            } else if (status == 6 && lockId == mExchangeBean.getExchangeBoxNumber()) {
+                sendCloseMessage();
+                sendShowMessage("请取出电池");
+                mCabinetManager.openDoor(0, mExchangeBean.getExchangeBoxNumber());
+                status = 6;
+            }
+        } else {
+            if (status == 2 && lockId == mExchangeBean.getEmptyBoxNumber()) {
+                sendCloseMessage();
+                status = -1;
+                mQRCode.setVisibility(View.VISIBLE);
             }
         }
     }
@@ -299,18 +372,6 @@ public class OperateFragment extends BaseFragment<OperatePresenter> implements O
                         Log.d(TAG, "放入电池    " + status);
                         sendCloseMessage();
                         sendShowMessage("电池放入成功,请关闭箱门");
-                        if (disposable == null || disposable.isDisposed()) {
-                            disposable = Observable.interval(0, 4, TimeUnit.SECONDS)
-                                    .subscribeOn(Schedulers.io())
-                                    .observeOn(AndroidSchedulers.mainThread())
-                                    .subscribe(new Consumer<Long>() {
-                                        @Override
-                                        public void accept(Long aLong) throws Exception {
-                                            Log.d(TAG, "getDoorStatus    " + status);
-                                            mCabinetManager.getDoorStatus(0, mExchangeBean.getEmptyBoxNumber());
-                                        }
-                                    });
-                        }
                         searchPackage(mExchangeBean.getEmptyBoxNumber());
                     }
                     BoxStatus boxStatus = boxStatuses.get(Integer.parseInt(batteryFrame.device));
@@ -331,18 +392,6 @@ public class OperateFragment extends BaseFragment<OperatePresenter> implements O
                         status = 7;
                         sendCloseMessage();
                         sendShowMessage("请关闭柜门");
-                        if (disposable == null || disposable.isDisposed()) {
-                            disposable = Observable.interval(0, 4, TimeUnit.SECONDS)
-                                    .subscribeOn(Schedulers.io())
-                                    .observeOn(AndroidSchedulers.mainThread())
-                                    .subscribe(new Consumer<Long>() {
-                                        @Override
-                                        public void accept(Long aLong) throws Exception {
-                                            Log.d(TAG, "getDoorStatus    " + status);
-                                            mCabinetManager.getDoorStatus(0, mExchangeBean.getExchangeBoxNumber());
-                                        }
-                                    });
-                        }
                     }
                     BoxStatus boxStatus2 = boxStatuses.get(Integer.parseInt(batteryFrame.device));
                     if (!boxStatus2.getEmpty()) {
@@ -426,6 +475,7 @@ public class OperateFragment extends BaseFragment<OperatePresenter> implements O
     @Override
     public void closeNewSuccess() {
         status = -1;//完成操作
+        mQRCode.setVisibility(View.VISIBLE);
         ToastUtil.show(getActivity(), "完成交易", Toast.LENGTH_SHORT);
         sendCloseMessage();
         mPresenter.logout(App.getInstance().getTicket());

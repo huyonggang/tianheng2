@@ -28,8 +28,8 @@ public class Const {
     public static final String ACK_DOORS_STATUS = "com.hzjubu.action.ACK_DOORS_STATUS";
 
     //获取指定副机指定箱格物检状态
-    public static final String REQ_GOODS_STATUS = "com.hzjubu.action.REQ_GOODS_STATUS";
     public static final String ACK_GOODS_STATUS = "com.hzjubu.action.ACK_GOODS_STATUS";
+    public static final String REQ_GOODS_STATUS = "com.hzjubu.action.REQ_GOODS_STATUS";
     //获取指定副机所有箱格物检状态
     public static final String ACK_GOODSES_STATUS = "com.hzjubu.action.ACK_GOODSES_STATUS";
     public static final String REQ_GOODSES_STATUS = "com.hzjubu.action.REQ_GOODSES_STATUS";

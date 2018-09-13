@@ -50,4 +50,27 @@ public class CabinetManager {
         mIntent.putExtra(LOCK_ID,iLockId);
         sendBroadcast();
     }
+
+    /**
+     * 获取指定门的物检
+     * @param iBoardId
+     * @param iLockId
+     */
+    public void getGoodStatus(int iBoardId,int iLockId){
+        mIntent.setAction(Const.REQ_GOODS_STATUS);
+        mIntent.putExtra(BOARD_ID,iBoardId);
+        mIntent.putExtra(LOCK_ID,iLockId);
+        sendBroadcast();
+    }
+
+    /**
+     * 获取所有门的物检
+     * @param iBoardId
+     */
+    public void getGoodsStatus(int iBoardId){
+        mIntent.setAction(Const.REQ_GOODSES_STATUS);
+        mIntent.putExtra(BOARD_ID,iBoardId);
+        mIntent.putExtra(BOXESCOUNTS,8);
+        sendBroadcast();
+    }
 }
