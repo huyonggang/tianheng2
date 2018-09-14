@@ -251,7 +251,7 @@ public class OperateFragment extends BaseFragment<OperatePresenter> implements O
                 Log.d(TAG, "箱门关闭    " + status);
                 Log.d(TAG, "getGoodsStatus    " + status);
                 if (disposable == null || disposable.isDisposed()) {
-                    disposable = Observable.timer(4, TimeUnit.SECONDS)
+                    disposable = Observable.timer(3, TimeUnit.SECONDS)
                             .subscribeOn(Schedulers.io())
                             .observeOn(AndroidSchedulers.mainThread())
                             .subscribe(new Consumer<Long>() {
@@ -361,6 +361,7 @@ public class OperateFragment extends BaseFragment<OperatePresenter> implements O
             } else if (status == 6 && lockId == mExchangeBean.getExchangeBoxNumber()) {
                 sendCloseMessage();
                 sendShowMessage("请取出电池");
+                status = 5;
                 mCabinetManager.openDoor(0, mExchangeBean.getExchangeBoxNumber());
             }
         } else {
