@@ -5,6 +5,7 @@ import android.app.Activity;
 import com.tianheng.client.model.di.ActivityScope;
 import com.tianheng.client.model.di.module.ActivityModule;
 import com.tianheng.client.ui.activity.HomeActivity;
+import com.tianheng.client.ui.activity.LogActivity;
 import com.tianheng.client.ui.activity.SettingActivity;
 import com.tianheng.client.ui.activity.UserActivity;
 
@@ -21,8 +22,12 @@ public interface ActivityComponent {
     Activity getActivity();
 
     void inject(HomeActivity homeActivity);
+
     void inject(UserActivity userActivity);
+
     void inject(SettingActivity settingActivity);
+
+    void inject(LogActivity logActivity);
 
 
 }

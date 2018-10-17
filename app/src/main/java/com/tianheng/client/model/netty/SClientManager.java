@@ -5,6 +5,9 @@ import android.util.Log;
 
 
 import com.tianheng.client.global.Const;
+import com.tianheng.client.model.event.FrameEvent;
+
+import org.greenrobot.eventbus.EventBus;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -70,12 +73,12 @@ public class SClientManager {
 
     public void start(final String ip, final String port) {
         Log.i(TAG, "SClientManager is starting...");
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    startNetty(ip,port);
-                }
-            }).start();
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                startNetty(ip, port);
+            }
+        }).start();
     }
 
     public void stop() {
@@ -98,7 +101,7 @@ public class SClientManager {
             flag = true;
         }
         try {
-            channel = bootstrap.connect(ip, Integer.parseInt(port)).sync().channel();
+            channel = bootstrap.connect(ip, Integer.parseInt(port)).addListener(new ConnectionListener(this)).sync().channel();
             isRunning = true;
             Log.e(TAG, "netty connect success");
         } catch (Exception e) {
@@ -136,7 +139,7 @@ public class SClientManager {
     }
 
 
-    public boolean sendFrame(Object frame) {
+    public boolean sendFrame(String frame) {
         if (frame == null) {
             Log.e(TAG, "frame sent failed, it can not be null");
             return false;
@@ -150,24 +153,43 @@ public class SClientManager {
             @Override
             public void operationComplete(ChannelFuture future) throws Exception {
                 Log.wtf(TAG, "netty send operationComplete ");
-//                if (!future.isSuccess()) {
-//                    System.out.println("Reconnection");
-//                    final EventLoop eventLoop = future.channel().eventLoop();
-//                    eventLoop.schedule(new Runnable() {
-//                        @Override
-//                        public void run() {
-//                            stopNetty();
-//                            startNetty(Const.BASE_IP, Const.BASE_PORT);
-//                        }
-//                    }, 1L, TimeUnit.SECONDS);
-//                }
 
             }
         });
         Log.e(TAG, "netty send -->" + frame);
+        EventBus.getDefault().post(new FrameEvent(frame));
         return true;
     }
 
+
+    public class ConnectionListener implements ChannelFutureListener {
+
+
+        private SClientManager client;
+
+
+        public ConnectionListener(SClientManager client) {
+            this.client = client;
+        }
+
+
+        @Override
+        public void operationComplete(ChannelFuture future) throws Exception {
+            if (!future.isSuccess()) {
+                System.out.println("Reconnection");
+                final EventLoop eventLoop = future.channel().eventLoop();
+                eventLoop.schedule(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        start(Const.BASE_IP, Const.BASE_PORT);
+                    }
+                }, 1L, TimeUnit.SECONDS);
+            }
+        }
+
+
+    }
 
 
 }
