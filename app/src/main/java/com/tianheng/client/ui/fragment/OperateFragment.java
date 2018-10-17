@@ -199,7 +199,7 @@ public class OperateFragment extends BaseFragment<OperatePresenter> implements O
 
     public void schedule() {
         //定时上传数据
-        timer.schedule(task, 10 * 1000, 5 * 60 * 1000);
+        timer.schedule(task, 10 * 1000,3 * 60 * 1000);
     }
 
     private void initView() {

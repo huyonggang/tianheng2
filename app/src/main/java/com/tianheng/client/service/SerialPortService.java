@@ -65,6 +65,7 @@ public class SerialPortService extends Service implements SerialPortUtil.OnDataR
         byte[] data = new byte[size];
         System.arraycopy(buffer, 0, data, 0, size);
         String frame = DataUtils.bytes2HexString(data, data.length);
+        Log.d("serial", frame);
         frameBuffer.append(frame);
     }
 
@@ -103,6 +104,7 @@ public class SerialPortService extends Service implements SerialPortUtil.OnDataR
             Log.d(TAG, "realFrame--->" + realFrame);
             if (realFrame.length() == 24) {
                 if (Const.FRAME_80.equals(realFrame.substring(8, 10))) {
+                    Log.d("batteryFrame",realFrame);
                     batteryFrame.head = realFrame.substring(0, 4);
                     batteryFrame.device = realFrame.substring(4, 8);
                     batteryFrame.fixed = realFrame.substring(8, 10);
