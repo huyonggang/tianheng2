@@ -152,7 +152,16 @@ public class SClientManager {
         lastWriteFuture.addListener(new ChannelFutureListener() {
             @Override
             public void operationComplete(ChannelFuture future) throws Exception {
-                Log.wtf(TAG, "netty send operationComplete ");
+                if (!future.isSuccess()){
+                    Log.wtf(TAG, "netty send status"+future.isSuccess());
+                    final EventLoop loop = future.channel().eventLoop();
+                    loop.schedule(new Runnable() {
+                        @Override
+                        public void run() {
+                            start(Const.BASE_IP, Const.BASE_PORT);
+                        }
+                    }, 1L, TimeUnit.SECONDS);
+                }
 
             }
         });

@@ -129,8 +129,8 @@ public class HomeActivity extends BaseActivity<HomePresenter> implements HomeCon
     private void initService() {
         serviceIn.setClass(this, SClientService.class);
         portIn.setClass(this, SerialPortService.class);
-       // bindService(portIn, mConnection, BIND_AUTO_CREATE);
-        //bindService(serviceIn, mClientConn, BIND_AUTO_CREATE);
+        bindService(portIn, mConnection, BIND_AUTO_CREATE);
+        bindService(serviceIn, mClientConn, BIND_AUTO_CREATE);
     }
 
     private void initFragment() {
