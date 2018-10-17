@@ -87,7 +87,7 @@ public class OperateFragment extends BaseFragment<OperatePresenter> implements O
     TextView mImei;
 
 
-    @OnClick({R.id.exchange})
+    @OnClick({R.id.exchange, R.id.imei})
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.exchange:
@@ -97,6 +97,16 @@ public class OperateFragment extends BaseFragment<OperatePresenter> implements O
                     return;
                 }
                 mPresenter.subscribeCode(code);
+                break;
+            case R.id.imei:
+                num--;
+                if (num == 0) {
+                    if (mLogFragment == null) {
+                        mLogFragment = LogFragment.newInstance();
+                    }
+                    mLogFragment.show(getChildFragmentManager(), "show");
+                    num = 5;
+                }
                 break;
 
         }
@@ -118,7 +128,8 @@ public class OperateFragment extends BaseFragment<OperatePresenter> implements O
     private Disposable disposable;
     private int deviceNo;
     private List<BoxStatus> boxStatuses = new ArrayList<>();
-
+    private int num = 5;
+    private LogFragment mLogFragment;
 
     @Override
     protected void initInject() {
@@ -188,7 +199,7 @@ public class OperateFragment extends BaseFragment<OperatePresenter> implements O
 
     public void schedule() {
         //定时上传数据
-        timer.schedule(task, 10 * 1000,5 * 60 * 1000);
+        timer.schedule(task, 10 * 1000,3 * 60 * 1000);
     }
 
     private void initView() {

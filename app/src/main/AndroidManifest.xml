@@ -68,6 +68,7 @@
             />
 
         <activity android:name=".ui.activity.SettingActivity"/>
+        <activity android:name=".ui.activity.LogActivity"/>
 
         <service android:name=".service.SClientService"
             android:exported="false"
