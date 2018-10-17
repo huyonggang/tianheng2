@@ -156,25 +156,21 @@ public class OperateFragment extends BaseFragment<OperatePresenter> implements O
     @Override
     public void onStart() {
         super.onStart();
-        if (!EventBus.getDefault().isRegistered(this)) {
-            EventBus.getDefault().register(this);
-        }
+
     }
 
     @Override
     public void onStop() {
         super.onStop();
-        if (EventBus.getDefault().isRegistered(this)) {
-            EventBus.getDefault().unregister(this);
-        }
-        if (timer != null) {
-            timer.cancel();
-        }
+
     }
 
 
     @Override
     protected void init() {
+        if (!EventBus.getDefault().isRegistered(this)) {
+            EventBus.getDefault().register(this);
+        }
         initView();
         initData();
         initCabinetManager();
@@ -743,5 +739,13 @@ public class OperateFragment extends BaseFragment<OperatePresenter> implements O
         mInputCode.setText(content);
         mInputCode.setSelection(content.length());
 
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (EventBus.getDefault().isRegistered(this)) {
+            EventBus.getDefault().unregister(this);
+        }
     }
 }

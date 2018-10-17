@@ -73,12 +73,7 @@ public class SClientManager {
 
     public void start(final String ip, final String port) {
         Log.i(TAG, "SClientManager is starting...");
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                startNetty(ip, port);
-            }
-        }).start();
+        startNetty(ip, port);
     }
 
     public void stop() {
