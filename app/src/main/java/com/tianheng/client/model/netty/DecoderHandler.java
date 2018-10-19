@@ -8,6 +8,7 @@ import com.tianheng.client.model.bean.PingBean;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
+import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.timeout.IdleState;
 import io.netty.handler.timeout.IdleStateEvent;
 
@@ -15,13 +16,14 @@ import io.netty.handler.timeout.IdleStateEvent;
  * Created by huyg on 2018/1/19.
  */
 
-public class DecoderHandler extends ChannelInboundHandlerAdapter {
+public class DecoderHandler extends SimpleChannelInboundHandler<Object> {
+
 
     @Override
-    public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+    protected void channelRead0(ChannelHandlerContext channelHandlerContext, Object o) throws Exception {
 
     }
-
+    //这里是出现异常的话要进行的操作
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
         // Close the connection when an exception is raised.

@@ -23,11 +23,13 @@ import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
+import com.google.gson.Gson;
 import com.tianheng.client.App;
 import com.tianheng.client.R;
 import com.tianheng.client.base.BaseActivity;
 import com.tianheng.client.broad.CabinetManager;
 import com.tianheng.client.model.bean.AdBean;
+import com.tianheng.client.model.bean.BatteryInfo;
 import com.tianheng.client.model.event.DoorErrorEvent;
 import com.tianheng.client.model.frame.BMSFrame;
 import com.tianheng.client.model.netty.SClientManager;
@@ -101,10 +103,18 @@ public class HomeActivity extends BaseActivity<HomePresenter> implements HomeCon
 
     @Override
     protected void init() {
+        initBroad();
+        
         initService();
         initData();
         initView();
         initCabinetManager();
+    }
+
+    private void initBroad() {
+        Intent intent = new Intent();
+        intent.setAction("com.yunma.start");
+        sendBroadcast(intent);
     }
 
     private void initCabinetManager() {
@@ -229,12 +239,43 @@ public class HomeActivity extends BaseActivity<HomePresenter> implements HomeCon
 
     @Override
     public void sendFrame(BMSFrame bmsFrame) {
-        mClientService.sendFrame(bmsFrame);
+        BatteryInfo batteryInfo = new BatteryInfo();
+        batteryInfo.setType(1);
+        batteryInfo.setCabinetNumber(App.getInstance().getImei());
+        batteryInfo.setBatteryNumber(bmsFrame.code);
+        batteryInfo.setBoxNumber(bmsFrame.pageNo);
+        batteryInfo.setCurPower(getPower(bmsFrame));
+        batteryInfo.setCurVoltage(sumVol(bmsFrame));
+        batteryInfo.setChargerStatus(resolveStatus(bmsFrame));
+        String frame = new Gson().toJson(batteryInfo);
+
+        Intent intent = new Intent();
+        intent.setAction("com.yunma.netty");
+        intent.putExtra("data", frame);
+        sendBroadcast(intent);
+        //SClientManager.getInstance().sendFrame(frame);
+        //mClientService.sendFrame(bmsFrame);
     }
 
     @Override
     public void sendEmptyBox(int boxNum) {
-        mClientService.sendEmptyBox(boxNum);
+        BatteryInfo batteryInfo = new BatteryInfo();
+        batteryInfo.setType(1);
+        batteryInfo.setCabinetNumber(App.getInstance().getImei());
+        batteryInfo.setBatteryNumber("");
+        batteryInfo.setBoxNumber(boxNum);
+        batteryInfo.setCurPower(0);
+        batteryInfo.setCurVoltage(0);
+        batteryInfo.setChargerStatus(2);
+        String frame = new Gson().toJson(batteryInfo);
+
+        Intent intent = new Intent();
+        intent.setAction("com.yunma.netty");
+        intent.putExtra("data", frame);
+        sendBroadcast(intent);
+
+//        SClientManager.getInstance().sendFrame(frame);
+//        mClientService.sendEmptyBox(boxNum);
     }
 
 
@@ -279,5 +320,52 @@ public class HomeActivity extends BaseActivity<HomePresenter> implements HomeCon
                         }
                     });
         }
+    }
+
+
+    public int getPower(BMSFrame bmsFrame) {
+        float capacity = Integer.parseInt(bmsFrame.capacity, 16);
+        float capacitySum = Integer.parseInt(bmsFrame.capacitySum, 16);
+        int power = (int) (capacity / capacitySum * 100);
+        return power;
+    }
+
+
+    public int resolveStatus(BMSFrame bmsFrame) {
+        int status ;
+        String statusStr = bmsFrame.status;
+        if ("0000".equals(statusStr)) {
+            status = 1;
+        } else if ("0001".equals(statusStr)) {
+            status = 0;
+        } else {
+            status = 2;
+        }
+        return status;
+    }
+
+    public double sumVol(BMSFrame bmsFrame) {
+        double sum = 0;
+        if (bmsFrame != null) {
+            sum = Integer.parseInt(bmsFrame.voltage1, 16) +
+                    Integer.parseInt(bmsFrame.voltage2, 16) +
+                    Integer.parseInt(bmsFrame.voltage3, 16) +
+                    Integer.parseInt(bmsFrame.voltage4, 16) +
+                    Integer.parseInt(bmsFrame.voltage5, 16) +
+                    Integer.parseInt(bmsFrame.voltage6, 16) +
+                    Integer.parseInt(bmsFrame.voltage7, 16) +
+                    Integer.parseInt(bmsFrame.voltage8, 16) +
+                    Integer.parseInt(bmsFrame.voltage9, 16) +
+                    Integer.parseInt(bmsFrame.voltage10, 16) +
+                    Integer.parseInt(bmsFrame.voltage11, 16) +
+                    Integer.parseInt(bmsFrame.voltage12, 16) +
+                    Integer.parseInt(bmsFrame.voltage13, 16) +
+                    Integer.parseInt(bmsFrame.voltage14, 16) +
+                    Integer.parseInt(bmsFrame.voltage15, 16) +
+                    Integer.parseInt(bmsFrame.voltage16, 16)
+            ;
+        }
+        sum = sum / 1000.0;
+        return sum;
     }
 }
