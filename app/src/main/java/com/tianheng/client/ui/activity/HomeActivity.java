@@ -140,7 +140,7 @@ public class HomeActivity extends BaseActivity<HomePresenter> implements HomeCon
         serviceIn.setClass(this, SClientService.class);
         portIn.setClass(this, SerialPortService.class);
         bindService(portIn, mConnection, BIND_AUTO_CREATE);
-        bindService(serviceIn, mClientConn, BIND_AUTO_CREATE);
+        //bindService(serviceIn, mClientConn, BIND_AUTO_CREATE);
     }
 
     private void initFragment() {
@@ -291,7 +291,7 @@ public class HomeActivity extends BaseActivity<HomePresenter> implements HomeCon
             disposable.dispose();
         }
 
-        unbindService(mClientConn);
+       // unbindService(mClientConn);
         unbindService(mConnection);
     }
 
