@@ -32,18 +32,6 @@ public class UnCeHandler implements Thread.UncaughtExceptionHandler {
             //如果用户没有处理则让系统默认的异常处理器来处理
             mDefaultHandler.uncaughtException(thread, ex);
         }else{
-            try{
-                Thread.sleep(2000);
-            }catch (InterruptedException e){
-            }
-            Intent intent = new Intent(application.getApplicationContext(), HomeActivity.class);
-            PendingIntent restartIntent = PendingIntent.getActivity(
-                    application.getApplicationContext(), 0, intent,
-                    Intent.FLAG_ACTIVITY_NEW_TASK);
-            //退出程序
-            AlarmManager mgr = (AlarmManager)application.getSystemService(Context.ALARM_SERVICE);
-            mgr.set(AlarmManager.RTC, System.currentTimeMillis() + 1000,
-                    restartIntent); // 1秒钟后重启应用
             App.getInstance().finishActivity();
         }
     }
