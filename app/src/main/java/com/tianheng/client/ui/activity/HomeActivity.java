@@ -111,6 +111,7 @@ public class HomeActivity extends BaseActivity<HomePresenter> implements HomeCon
         initCabinetManager();
     }
 
+
     private void initBroad() {
         Intent intent = new Intent();
         intent.setAction("com.yunma.start");
@@ -139,7 +140,7 @@ public class HomeActivity extends BaseActivity<HomePresenter> implements HomeCon
     private void initService() {
         serviceIn.setClass(this, SClientService.class);
         portIn.setClass(this, SerialPortService.class);
-        bindService(portIn, mConnection, BIND_AUTO_CREATE);
+        //bindService(portIn, mConnection, BIND_AUTO_CREATE);
         //bindService(serviceIn, mClientConn, BIND_AUTO_CREATE);
     }
 
@@ -292,7 +293,7 @@ public class HomeActivity extends BaseActivity<HomePresenter> implements HomeCon
         }
 
        // unbindService(mClientConn);
-        unbindService(mConnection);
+        //unbindService(mConnection);
     }
 
     @Override

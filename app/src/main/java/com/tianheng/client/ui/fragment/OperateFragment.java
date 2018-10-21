@@ -174,6 +174,7 @@ public class OperateFragment extends BaseFragment<OperatePresenter> implements O
         initView();
         initData();
         initCabinetManager();
+
     }
 
     private void initCabinetManager() {

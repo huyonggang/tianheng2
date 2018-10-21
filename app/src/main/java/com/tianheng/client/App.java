@@ -55,7 +55,7 @@ public class App extends MultiDexApplication{
         //JPushInterface.setDebugMode(true); 	// 设置开启日志,发布时请关闭日志
          //JPushInterface.init(this);     		// 初始化 JPush
         SpeechUtility.createUtility(this,param);
-        initCrash();
+        //initCrash();
         UnCeHandler catchExcep = new UnCeHandler(this);
         Thread.setDefaultUncaughtExceptionHandler(catchExcep);
     }
