@@ -70,6 +70,8 @@ public class SerialPortUtil {
         } catch (IOException e) {
             e.printStackTrace();
             result = false;
+            closeSerialPort();
+            onCreate();
         }
         return result;
     }
@@ -96,6 +98,8 @@ public class SerialPortUtil {
                     Thread.sleep(100);
                 } catch (Exception e) {
                     e.printStackTrace();
+                    closeSerialPort();
+                    onCreate();
                     return;
                 }
             }
