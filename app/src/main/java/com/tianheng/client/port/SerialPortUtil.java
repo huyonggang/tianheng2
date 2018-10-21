@@ -89,6 +89,7 @@ public class SerialPortUtil {
                     size = mInputStream.read(buffer);
                     if (size > 0) {
                         if (null != onDataReceiveListener) {
+                            //onDataReceiveListener = null;
                             onDataReceiveListener.onDataReceive(buffer, size);
                         }
                     }
