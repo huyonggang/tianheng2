@@ -87,6 +87,7 @@ public class HomeActivity extends BaseActivity<HomePresenter> implements HomeCon
     private ShapeLoadingDialog.Builder mBuilder;
     private CabinetManager mCabinetManager;
     private Disposable disposable;
+    private Intent mDataIntent = new Intent();
 
     @Override
     protected void initInject() {
@@ -104,11 +105,16 @@ public class HomeActivity extends BaseActivity<HomePresenter> implements HomeCon
     @Override
     protected void init() {
         initBroad();
-        
+        initIntent();
         initService();
         initData();
         initView();
         initCabinetManager();
+    }
+
+    private void initIntent() {
+        mDataIntent.setAction("com.yunma.netty");
+
     }
 
 
@@ -140,7 +146,7 @@ public class HomeActivity extends BaseActivity<HomePresenter> implements HomeCon
     private void initService() {
         serviceIn.setClass(this, SClientService.class);
         portIn.setClass(this, SerialPortService.class);
-        //bindService(portIn, mConnection, BIND_AUTO_CREATE);
+        bindService(portIn, mConnection, BIND_AUTO_CREATE);
         //bindService(serviceIn, mClientConn, BIND_AUTO_CREATE);
     }
 
@@ -249,13 +255,8 @@ public class HomeActivity extends BaseActivity<HomePresenter> implements HomeCon
         batteryInfo.setCurVoltage(sumVol(bmsFrame));
         batteryInfo.setChargerStatus(resolveStatus(bmsFrame));
         String frame = new Gson().toJson(batteryInfo);
-
-        Intent intent = new Intent();
-        intent.setAction("com.yunma.netty");
-        intent.putExtra("data", frame);
-        sendBroadcast(intent);
-        //SClientManager.getInstance().sendFrame(frame);
-        //mClientService.sendFrame(bmsFrame);
+        mDataIntent.putExtra("data", frame);
+        sendBroadcast(mDataIntent);
     }
 
     @Override
@@ -269,14 +270,8 @@ public class HomeActivity extends BaseActivity<HomePresenter> implements HomeCon
         batteryInfo.setCurVoltage(0);
         batteryInfo.setChargerStatus(2);
         String frame = new Gson().toJson(batteryInfo);
-
-        Intent intent = new Intent();
-        intent.setAction("com.yunma.netty");
-        intent.putExtra("data", frame);
-        sendBroadcast(intent);
-
-//        SClientManager.getInstance().sendFrame(frame);
-//        mClientService.sendEmptyBox(boxNum);
+        mDataIntent.putExtra("data", frame);
+        sendBroadcast(mDataIntent);
     }
 
 
@@ -335,10 +330,10 @@ public class HomeActivity extends BaseActivity<HomePresenter> implements HomeCon
     public int resolveStatus(BMSFrame bmsFrame) {
         int status ;
         String statusStr = bmsFrame.status;
-        if ("0000".equals(statusStr)) {
-            status = 1;
-        } else if ("0001".equals(statusStr)) {
-            status = 0;
+        if ("00000000".equals(statusStr)) {
+            status = 1;//充满
+        } else if ("00000001".equals(statusStr)) {
+            status = 0;//充电中
         } else {
             status = 2;
         }
