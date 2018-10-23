@@ -219,7 +219,6 @@ public class OperateFragment extends BaseFragment<OperatePresenter> implements O
         sendShowMessage("正在打开箱门，请稍后...");
         Log.d(TAG, "正在打开箱门    " + status);
         Log.d(TAG, "正在打开箱门    " + mExchangeBean.toString());
-        mQRCode.setVisibility(View.GONE);
         if (mExchangeBean.getEmptyBoxNumber() == -1) {
             status = 5;
             mCabinetManager.openDoor(0, mExchangeBean.getExchangeBoxNumber());
@@ -376,7 +375,6 @@ public class OperateFragment extends BaseFragment<OperatePresenter> implements O
             if (status == 2 && lockId == mExchangeBean.getEmptyBoxNumber()) {
                 sendCloseMessage();
                 status = -1;
-                mQRCode.setVisibility(View.VISIBLE);
             } else if (status == 6 && event.iLockId == mExchangeBean.getExchangeBoxNumber()) {
                 sendCloseMessage();
                 Log.d(TAG, "关闭箱门,无物体    " + status);
@@ -500,7 +498,6 @@ public class OperateFragment extends BaseFragment<OperatePresenter> implements O
     @Override
     public void closeNewSuccess() {
         status = -1;//完成操作
-        mQRCode.setVisibility(View.VISIBLE);
         ToastUtil.show(getActivity(), "完成交易", Toast.LENGTH_SHORT);
         sendCloseMessage();
         mPresenter.logout(App.getInstance().getTicket());

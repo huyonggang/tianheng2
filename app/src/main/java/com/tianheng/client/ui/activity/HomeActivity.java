@@ -246,22 +246,23 @@ public class HomeActivity extends BaseActivity<HomePresenter> implements HomeCon
 
     @Override
     public void sendFrame(BMSFrame bmsFrame) {
-        Log.d("voltage", "voltage1" + Integer.parseInt(bmsFrame.voltage1, 16));
-        Log.d("voltage", "voltage2" + Integer.parseInt(bmsFrame.voltage2, 16));
-        Log.d("voltage", "voltage3" + Integer.parseInt(bmsFrame.voltage3, 16));
-        Log.d("voltage", "voltage4" + Integer.parseInt(bmsFrame.voltage4, 16));
-        Log.d("voltage", "voltage5" + Integer.parseInt(bmsFrame.voltage5, 16));
-        Log.d("voltage", "voltage6" + Integer.parseInt(bmsFrame.voltage6, 16));
-        Log.d("voltage", "voltage7" + Integer.parseInt(bmsFrame.voltage7, 16));
-        Log.d("voltage", "voltage8" + Integer.parseInt(bmsFrame.voltage8, 16));
-        Log.d("voltage", "voltage9" + Integer.parseInt(bmsFrame.voltage9, 16));
-        Log.d("voltage", "voltage10" + Integer.parseInt(bmsFrame.voltage10, 16));
-        Log.d("voltage", "voltage11" + Integer.parseInt(bmsFrame.voltage11, 16));
-        Log.d("voltage", "voltage12" + Integer.parseInt(bmsFrame.voltage12, 16));
-        Log.d("voltage", "voltage13" + Integer.parseInt(bmsFrame.voltage13, 16));
-        Log.d("voltage", "voltage14" + Integer.parseInt(bmsFrame.voltage14, 16));
-        Log.d("voltage", "voltage15" + Integer.parseInt(bmsFrame.voltage15, 16));
-        Log.d("voltage", "voltage16" + Integer.parseInt(bmsFrame.voltage16, 16));
+        Log.d("voltage", bmsFrame.code+"  voltage1->  " + Integer.parseInt(bmsFrame.voltage1, 16));
+        Log.d("voltage", bmsFrame.code+"  voltage2->  " + Integer.parseInt(bmsFrame.voltage2, 16));
+        Log.d("voltage", bmsFrame.code+"  voltage3->  " + Integer.parseInt(bmsFrame.voltage3, 16));
+        Log.d("voltage", bmsFrame.code+"  voltage4->  " + Integer.parseInt(bmsFrame.voltage4, 16));
+        Log.d("voltage", bmsFrame.code+"  voltage5->  " + Integer.parseInt(bmsFrame.voltage5, 16));
+        Log.d("voltage", bmsFrame.code+"  voltage6->  " + Integer.parseInt(bmsFrame.voltage6, 16));
+        Log.d("voltage", bmsFrame.code+"  voltage7->  " + Integer.parseInt(bmsFrame.voltage7, 16));
+        Log.d("voltage", bmsFrame.code+"  voltage8->  " + Integer.parseInt(bmsFrame.voltage8, 16));
+        Log.d("voltage", bmsFrame.code+"  voltage9->  " + Integer.parseInt(bmsFrame.voltage9, 16));
+        Log.d("voltage", bmsFrame.code+"  voltage10->  " + Integer.parseInt(bmsFrame.voltage10, 16));
+        Log.d("voltage", bmsFrame.code+"  voltage11->  " + Integer.parseInt(bmsFrame.voltage11, 16));
+        Log.d("voltage", bmsFrame.code+"  voltage12->  " + Integer.parseInt(bmsFrame.voltage12, 16));
+        Log.d("voltage", bmsFrame.code+"  voltage13->  " + Integer.parseInt(bmsFrame.voltage13, 16));
+        Log.d("voltage", bmsFrame.code+"  voltage14->  " + Integer.parseInt(bmsFrame.voltage14, 16));
+        Log.d("voltage", bmsFrame.code+"  voltage15->  " + Integer.parseInt(bmsFrame.voltage15, 16));
+        Log.d("voltage", bmsFrame.code+"  voltage16->  " + Integer.parseInt(bmsFrame.voltage16, 16));
+        Log.d("status", bmsFrame.code+"  status->  " + bmsFrame.status);
         BatteryInfo batteryInfo = new BatteryInfo();
         batteryInfo.setType(1);
         batteryInfo.setCabinetNumber(App.getInstance().getImei());
