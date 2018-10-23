@@ -196,7 +196,7 @@ public class OperateFragment extends BaseFragment<OperatePresenter> implements O
 
     public void schedule() {
         //定时上传数据
-        timer.schedule(task, 10 * 1000,5 * 60 * 1000);
+        timer.schedule(task, 10 * 1000, 5 * 60 * 1000);
     }
 
     private void initView() {
@@ -596,7 +596,7 @@ public class OperateFragment extends BaseFragment<OperatePresenter> implements O
             if (boxStatuses != null && boxStatuses.size() > 0) {
                 for (int i = 0; i < boxStatuses.size(); i++) {
                     //检测电池
-                    if (!boxStatuses.get(i).getEmpty()) {
+                    if (!boxStatuses.get(i).getEmpty() && status == -1) {
                         searchPackage(i);
                     }
                     //上传空柜子

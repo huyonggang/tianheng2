@@ -80,7 +80,7 @@ public class HomeActivity extends BaseActivity<HomePresenter> implements HomeCon
     private Intent mIntent = new Intent();
     private TextView mSubView;
     private TextView mTitleView;
-    private List<String> images =new ArrayList<>();
+    private List<String> images = new ArrayList<>();
     private SerialPortService mPortService;
     private SClientService mClientService;
     private ShapeLoadingDialog mDialog;
@@ -246,6 +246,22 @@ public class HomeActivity extends BaseActivity<HomePresenter> implements HomeCon
 
     @Override
     public void sendFrame(BMSFrame bmsFrame) {
+        Log.d("voltage", "voltage1" + Integer.parseInt(bmsFrame.voltage1, 16));
+        Log.d("voltage", "voltage2" + Integer.parseInt(bmsFrame.voltage2, 16));
+        Log.d("voltage", "voltage3" + Integer.parseInt(bmsFrame.voltage3, 16));
+        Log.d("voltage", "voltage4" + Integer.parseInt(bmsFrame.voltage4, 16));
+        Log.d("voltage", "voltage5" + Integer.parseInt(bmsFrame.voltage5, 16));
+        Log.d("voltage", "voltage6" + Integer.parseInt(bmsFrame.voltage6, 16));
+        Log.d("voltage", "voltage7" + Integer.parseInt(bmsFrame.voltage7, 16));
+        Log.d("voltage", "voltage8" + Integer.parseInt(bmsFrame.voltage8, 16));
+        Log.d("voltage", "voltage9" + Integer.parseInt(bmsFrame.voltage9, 16));
+        Log.d("voltage", "voltage10" + Integer.parseInt(bmsFrame.voltage10, 16));
+        Log.d("voltage", "voltage11" + Integer.parseInt(bmsFrame.voltage11, 16));
+        Log.d("voltage", "voltage12" + Integer.parseInt(bmsFrame.voltage12, 16));
+        Log.d("voltage", "voltage13" + Integer.parseInt(bmsFrame.voltage13, 16));
+        Log.d("voltage", "voltage14" + Integer.parseInt(bmsFrame.voltage14, 16));
+        Log.d("voltage", "voltage15" + Integer.parseInt(bmsFrame.voltage15, 16));
+        Log.d("voltage", "voltage16" + Integer.parseInt(bmsFrame.voltage16, 16));
         BatteryInfo batteryInfo = new BatteryInfo();
         batteryInfo.setType(1);
         batteryInfo.setCabinetNumber(App.getInstance().getImei());
@@ -283,11 +299,11 @@ public class HomeActivity extends BaseActivity<HomePresenter> implements HomeCon
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (disposable!=null){
+        if (disposable != null) {
             disposable.dispose();
         }
 
-       // unbindService(mClientConn);
+        // unbindService(mClientConn);
         //unbindService(mConnection);
     }
 
@@ -328,7 +344,7 @@ public class HomeActivity extends BaseActivity<HomePresenter> implements HomeCon
 
 
     public int resolveStatus(BMSFrame bmsFrame) {
-        int status ;
+        int status;
         String statusStr = bmsFrame.status;
         if ("00000000".equals(statusStr)) {
             status = 1;//充满
