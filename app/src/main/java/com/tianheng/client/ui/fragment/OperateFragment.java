@@ -206,15 +206,16 @@ public class OperateFragment extends BaseFragment<OperatePresenter> implements O
                     .subscribe(new Consumer<Long>() {
                         @Override
                         public void accept(Long aLong) throws Exception {
-                            Log.d(TAG, "getDoorStatus    " + status);
-                            mCabinetManager.getGoodStatus(0, 0);
-                            mCabinetManager.getGoodStatus(0, 1);
-                            mCabinetManager.getGoodStatus(0, 2);
-                            mCabinetManager.getGoodStatus(0, 3);
-                            mCabinetManager.getGoodStatus(0, 4);
-                            mCabinetManager.getGoodStatus(0, 5);
-                            mCabinetManager.getGoodStatus(0, 6);
-                            mCabinetManager.getGoodStatus(0, 7);
+                            if (status==-1){
+                                mCabinetManager.getGoodStatus(0, 0);
+                                mCabinetManager.getGoodStatus(0, 1);
+                                mCabinetManager.getGoodStatus(0, 2);
+                                mCabinetManager.getGoodStatus(0, 3);
+                                mCabinetManager.getGoodStatus(0, 4);
+                                mCabinetManager.getGoodStatus(0, 5);
+                                mCabinetManager.getGoodStatus(0, 6);
+                                mCabinetManager.getGoodStatus(0, 7);
+                            }
                         }
                     });
         }
