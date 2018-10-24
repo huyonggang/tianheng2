@@ -182,7 +182,7 @@ public class HomeActivity extends BaseActivity<HomePresenter> implements HomeCon
         public void onServiceConnected(ComponentName name, IBinder service) {
             SerialPortService.MyBind bind = (SerialPortService.MyBind) service;
             mPortService = bind.getService();
-            mOperateFragment.schedule();
+            mOperateFragment.initDispose();
         }
 
         @Override

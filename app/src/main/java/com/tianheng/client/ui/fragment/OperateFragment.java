@@ -167,7 +167,6 @@ public class OperateFragment extends BaseFragment<OperatePresenter> implements O
     @Override
     public void onStop() {
         super.onStop();
-
     }
 
 
@@ -188,27 +187,34 @@ public class OperateFragment extends BaseFragment<OperatePresenter> implements O
 
     private void initData() {
         //mPresenter.getQRCode(imei, 200, 200, "png");
-        boxStatuses.clear();
-        for (int i = 0; i < 8; i++) {
-            BoxStatus boxStatus = new BoxStatus();
-            boxStatus.setEmpty(true);
-            boxStatus.setBoxNum(i);
-            boxStatuses.add(boxStatus);
-        }
-        initDispose();
+//        boxStatuses.clear();
+//        for (int i = 0; i < 8; i++) {
+//            BoxStatus boxStatus = new BoxStatus();
+//            boxStatus.setEmpty(true);
+//            boxStatus.setBoxNum(i);
+//            boxStatuses.add(boxStatus);
+//        }
+        // initDispose();
 
     }
 
-    private void initDispose() {
+    public void initDispose() {
         if (boxDisposable == null || boxDisposable.isDisposed()) {
-            boxDisposable = Observable.interval(0, 4, TimeUnit.SECONDS)
+            boxDisposable = Observable.interval(20, 5 * 60, TimeUnit.SECONDS)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(new Consumer<Long>() {
                         @Override
                         public void accept(Long aLong) throws Exception {
                             Log.d(TAG, "getDoorStatus    " + status);
-                            mCabinetManager.getGoodsStatus(0);
+                            mCabinetManager.getGoodStatus(0, 0);
+                            mCabinetManager.getGoodStatus(0, 1);
+                            mCabinetManager.getGoodStatus(0, 2);
+                            mCabinetManager.getGoodStatus(0, 3);
+                            mCabinetManager.getGoodStatus(0, 4);
+                            mCabinetManager.getGoodStatus(0, 5);
+                            mCabinetManager.getGoodStatus(0, 6);
+                            mCabinetManager.getGoodStatus(0, 7);
                         }
                     });
         }
@@ -432,6 +438,8 @@ public class OperateFragment extends BaseFragment<OperatePresenter> implements O
                 }
                 closeDialog();
                 mPresenter.closeOld(mExchangeBean.getLeaseBatteryNumber(), mExchangeBean.getEmptyBoxNumber());
+            } else if (status == -1) {
+                searchPackage(lockId);
             }
         } else {
             if (status == 2 && lockId == mExchangeBean.getEmptyBoxNumber()) {
@@ -453,6 +461,8 @@ public class OperateFragment extends BaseFragment<OperatePresenter> implements O
                 }
                 sendCloseMessage();
                 status = -1;
+            } else if (status == -1) {
+                mListener.sendEmptyBox(lockId);
             }
         }
     }
