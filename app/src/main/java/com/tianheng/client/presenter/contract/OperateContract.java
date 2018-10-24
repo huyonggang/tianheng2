@@ -21,6 +21,7 @@ public interface OperateContract {
         void openDoor(ExchangeBean exchangeBean);
         void closeOldSuccess();
         void closeNewSuccess();
+        void closeNewFail(int box);
         void closeDialog();
         void showDialog(String message);
         void showQRImg(String url);

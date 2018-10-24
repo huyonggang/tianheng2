@@ -76,14 +76,14 @@ public class OperatePresenter extends RxPresenter<OperateContract.View> implemen
                         if (baseHttpResponse.isSuccess()) {
                             mView.closeNewSuccess();
                         }else{
-                            mView.showContent(baseHttpResponse.getMessage());
+                            mView.closeNewFail(exchangeBoxNumber);
                         }
 
                     }
                 }, new Consumer<Throwable>() {
                     @Override
                     public void accept(Throwable throwable) throws Exception {
-                        mView.showContent(throwable.getMessage());
+                        mView.closeNewFail(exchangeBoxNumber);
                         mView.closeDialog();
                     }
                 });

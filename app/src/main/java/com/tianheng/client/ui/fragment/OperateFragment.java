@@ -1,6 +1,7 @@
 package com.tianheng.client.ui.fragment;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.os.Handler;
 import android.os.Message;
 import android.text.TextUtils;
@@ -25,6 +26,7 @@ import com.tianheng.client.model.bean.ExchangeBean;
 import com.tianheng.client.model.bean.SubscribeBean;
 import com.tianheng.client.model.bean.UserBean;
 import com.tianheng.client.model.event.DoorStatusEvent;
+import com.tianheng.client.model.event.DoorsStatusEvent;
 import com.tianheng.client.model.event.GoodStatusEvent;
 import com.tianheng.client.model.event.JPushEvent;
 import com.tianheng.client.model.event.OpenDoorEvent;
@@ -36,6 +38,7 @@ import com.tianheng.client.presenter.contract.OperateContract;
 import com.tianheng.client.util.CheckUtil;
 import com.tianheng.client.util.DecodeFrame;
 import com.tianheng.client.util.EncodeFrame;
+import com.tianheng.client.util.QRCodeUtil;
 import com.tianheng.client.util.ToastUtil;
 import com.tianheng.client.wedget.NumberKeyboardView;
 
@@ -126,6 +129,7 @@ public class OperateFragment extends BaseFragment<OperatePresenter> implements O
     private Timer timer = new Timer();
     private String lastPageNo = "";
     private Disposable disposable;
+    private Disposable boxDisposable;
     private int deviceNo;
     private List<BoxStatus> boxStatuses = new ArrayList<>();
     private int num = 5;
@@ -182,15 +186,30 @@ public class OperateFragment extends BaseFragment<OperatePresenter> implements O
     }
 
     private void initData() {
-        String imei = App.getInstance().getImei();
-        mImei.setText(MessageFormat.format("电池柜编号:{0}", imei));
-        mPresenter.getQRCode(imei, 200, 200, "png");
+        //mPresenter.getQRCode(imei, 200, 200, "png");
         boxStatuses.clear();
         for (int i = 0; i < 8; i++) {
             BoxStatus boxStatus = new BoxStatus();
             boxStatus.setEmpty(true);
             boxStatus.setBoxNum(i);
             boxStatuses.add(boxStatus);
+        }
+        initDispose();
+
+    }
+
+    private void initDispose() {
+        if (boxDisposable == null || boxDisposable.isDisposed()) {
+            boxDisposable = Observable.interval(0, 4, TimeUnit.SECONDS)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(new Consumer<Long>() {
+                        @Override
+                        public void accept(Long aLong) throws Exception {
+                            Log.d(TAG, "getDoorStatus    " + status);
+                            mCabinetManager.getGoodsStatus(0);
+                        }
+                    });
         }
     }
 
@@ -203,6 +222,14 @@ public class OperateFragment extends BaseFragment<OperatePresenter> implements O
         mKeyboardLayout.setVisibility(View.GONE);
         initEditText();
         initKeyboard();
+        initQRCode();
+    }
+
+    private void initQRCode() {
+        String imei = App.getInstance().getImei();
+        mImei.setText(MessageFormat.format("电池柜编号:{0}", imei));
+        Bitmap mBitmap = QRCodeUtil.createQRCodeBitmap(imei, 300, 300);
+        mQRCode.setImageBitmap(mBitmap);
     }
 
     @Override
@@ -227,6 +254,19 @@ public class OperateFragment extends BaseFragment<OperatePresenter> implements O
             mCabinetManager.openDoor(0, mExchangeBean.getEmptyBoxNumber());
         }
 
+    }
+
+    @Subscribe
+    public void onEvent(DoorsStatusEvent event) {
+        List<Integer> goods = event.opendArray;
+        for (int i = 0; i < goods.size(); i++) {
+            if (goods.get(i) == 0) {
+                boxStatuses.get(i).setEmpty(true);
+            } else {
+                boxStatuses.get(i).setEmpty(false);
+            }
+
+        }
     }
 
     /**
@@ -269,8 +309,6 @@ public class OperateFragment extends BaseFragment<OperatePresenter> implements O
                                 }
                             });
                 }
-
-
             } else if (status == 6 && event.iLockId == mExchangeBean.getExchangeBoxNumber()) {
                 if (disposable != null) {
                     disposable.dispose();
@@ -290,8 +328,25 @@ public class OperateFragment extends BaseFragment<OperatePresenter> implements O
                 }
 
             }
-        } else {
-
+        }
+        //网络请求失败
+        else if (status == 11 && event.iLockId == mExchangeBean.getEmptyBoxNumber()) {
+            status = 12;
+            if (disposable != null) {
+                disposable.dispose();
+            }
+            if (disposable == null || disposable.isDisposed()) {
+                disposable = Observable.timer(2, TimeUnit.SECONDS)
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(new Consumer<Long>() {
+                            @Override
+                            public void accept(Long aLong) throws Exception {
+                                Log.d(TAG, "getDoorStatus    " + status);
+                                mCabinetManager.getGoodStatus(0, mExchangeBean.getEmptyBoxNumber());
+                            }
+                        });
+            }
         }
 
     }
@@ -370,15 +425,33 @@ public class OperateFragment extends BaseFragment<OperatePresenter> implements O
                 sendShowMessage("请取出电池");
                 status = 5;
                 mCabinetManager.openDoor(0, mExchangeBean.getExchangeBoxNumber());
+            } else if (status == 12 && lockId == mExchangeBean.getEmptyBoxNumber()) {
+                if (disposable != null) {
+                    disposable.dispose();
+                }
+                closeDialog();
+                mPresenter.closeOld(mExchangeBean.getLeaseBatteryNumber(), mExchangeBean.getEmptyBoxNumber());
             }
         } else {
             if (status == 2 && lockId == mExchangeBean.getEmptyBoxNumber()) {
+                if (disposable != null) {
+                    disposable.dispose();
+                }
                 sendCloseMessage();
                 status = -1;
             } else if (status == 6 && event.iLockId == mExchangeBean.getExchangeBoxNumber()) {
+                if (disposable != null) {
+                    disposable.dispose();
+                }
                 sendCloseMessage();
                 Log.d(TAG, "关闭箱门,无物体    " + status);
                 mPresenter.closeNew(mExchangeBean.getExchangeBoxNumber(), mExchangeBean.getExchangeBatteryNumber());
+            } else if (status == 12 && lockId == mExchangeBean.getEmptyBoxNumber()) {
+                if (disposable != null) {
+                    disposable.dispose();
+                }
+                sendCloseMessage();
+                status = -1;
             }
         }
     }
@@ -401,25 +474,13 @@ public class OperateFragment extends BaseFragment<OperatePresenter> implements O
                         sendShowMessage("电池放入成功,请关闭箱门");
                         searchPackage(mExchangeBean.getEmptyBoxNumber());
                     }
-                    BoxStatus boxStatus = boxStatuses.get(Integer.parseInt(batteryFrame.device));
-                    if (boxStatus.getEmpty()) {
-                        boxStatus.setEmpty(false);
-                        boxStatuses.set(Integer.parseInt(batteryFrame.device), boxStatus);
-                    }
-
-                    break;
-                //断开状态
+                    //断开状态
                 case "01":
                     if ((status == 4 || status == 3) && Integer.parseInt(batteryFrame.device) == mExchangeBean.getEmptyBoxNumber()) {//  //检测成功或正在检测后拔出
                         status = 2;
                         sendCloseMessage();
                         sendShowMessage("请插入电池");
                         Log.d(TAG, "电池拔出    " + status);
-                    }
-                    BoxStatus boxStatus2 = boxStatuses.get(Integer.parseInt(batteryFrame.device));
-                    if (!boxStatus2.getEmpty()) {
-                        boxStatus2.setEmpty(true);
-                        boxStatuses.set(Integer.parseInt(batteryFrame.device), boxStatus2);
                     }
                     break;
             }
@@ -498,11 +559,30 @@ public class OperateFragment extends BaseFragment<OperatePresenter> implements O
     @Override
     public void closeNewSuccess() {
         status = -1;//完成操作
+        mCabinetManager.getGoodsStatus(0);
         ToastUtil.show(getActivity(), "完成交易", Toast.LENGTH_SHORT);
         sendCloseMessage();
         mPresenter.logout(App.getInstance().getTicket());
         hindKeyboard();
         mInputCode.setText("");
+    }
+
+    @Override
+    public void closeNewFail(int box) {
+        mCabinetManager.openDoor(0, box);
+        status = 11;//网络请求失败
+        ToastUtil.show(getActivity(), "系统错误，请取出电池", Toast.LENGTH_SHORT);
+        if (disposable == null || disposable.isDisposed()) {
+            disposable = Observable.interval(3, 4, TimeUnit.SECONDS)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(new Consumer<Long>() {
+                        @Override
+                        public void accept(Long aLong) throws Exception {
+                            mCabinetManager.getDoorStatus(0, mExchangeBean.getEmptyBoxNumber());
+                        }
+                    });
+        }
     }
 
 

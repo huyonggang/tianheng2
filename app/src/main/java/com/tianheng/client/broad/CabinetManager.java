@@ -73,7 +73,6 @@ public class CabinetManager {
         mIntent.setAction(Const.REQ_GOODSES_STATUS);
         mIntent.putExtra(BOARD_ID,iBoardId);
         mIntent.putExtra(BOXESCOUNTS,8);
-
         sendBroadcast();
     }
 }
