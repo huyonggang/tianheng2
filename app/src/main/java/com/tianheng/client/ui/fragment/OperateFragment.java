@@ -335,26 +335,27 @@ public class OperateFragment extends BaseFragment<OperatePresenter> implements O
                 }
 
             }
-        }
-        //网络请求失败
-        else if (status == 11 && event.iLockId == mExchangeBean.getEmptyBoxNumber()) {
-            status = 12;
-            if (disposable != null) {
-                disposable.dispose();
+            //网络请求失败
+            else if (status == 11 && event.iLockId == mExchangeBean.getEmptyBoxNumber()) {
+                status = 12;
+                if (disposable != null) {
+                    disposable.dispose();
+                }
+                if (disposable == null || disposable.isDisposed()) {
+                    disposable = Observable.timer(2, TimeUnit.SECONDS)
+                            .subscribeOn(Schedulers.io())
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .subscribe(new Consumer<Long>() {
+                                @Override
+                                public void accept(Long aLong) throws Exception {
+                                    Log.d(TAG, "getDoorStatus    " + status);
+                                    mCabinetManager.getGoodStatus(0, mExchangeBean.getEmptyBoxNumber());
+                                }
+                            });
+                }
             }
-            if (disposable == null || disposable.isDisposed()) {
-                disposable = Observable.timer(2, TimeUnit.SECONDS)
-                        .subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(new Consumer<Long>() {
-                            @Override
-                            public void accept(Long aLong) throws Exception {
-                                Log.d(TAG, "getDoorStatus    " + status);
-                                mCabinetManager.getGoodStatus(0, mExchangeBean.getEmptyBoxNumber());
-                            }
-                        });
-            }
         }
+
 
     }
 
@@ -459,8 +460,12 @@ public class OperateFragment extends BaseFragment<OperatePresenter> implements O
                 if (disposable != null) {
                     disposable.dispose();
                 }
-                sendCloseMessage();
                 status = -1;
+                sendCloseMessage();
+                mPresenter.logout(App.getInstance().getTicket());
+                hindKeyboard();
+                mInputCode.setText("");
+
             } else if (status == -1) {
                 mListener.sendEmptyBox(lockId);
             }
@@ -570,7 +575,6 @@ public class OperateFragment extends BaseFragment<OperatePresenter> implements O
     @Override
     public void closeNewSuccess() {
         status = -1;//完成操作
-        mCabinetManager.getGoodsStatus(0);
         ToastUtil.show(getActivity(), "完成交易", Toast.LENGTH_SHORT);
         sendCloseMessage();
         mPresenter.logout(App.getInstance().getTicket());
