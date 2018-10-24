@@ -11,7 +11,6 @@ import com.tianheng.client.global.Const;
  */
 
 public class CabinetManager {
-    private Intent mIntent;
     private Context mContext;
 
     private static final String BOARD_ID = "iBoardId";
@@ -19,14 +18,9 @@ public class CabinetManager {
     private static final String BOXESCOUNTS = "iBoxesCounts";
 
     public CabinetManager(Context context){
-        mIntent = new Intent();
         mContext = context;
     }
 
-
-    public void sendBroadcast(){
-        mContext.sendBroadcast(mIntent);
-    }
 
     /**
      * 打开指定副机指定箱格
@@ -34,10 +28,11 @@ public class CabinetManager {
      * @param iLockId 箱门id
      */
     public void openDoor(int iBoardId,int iLockId){
-        mIntent.setAction(Const.REQ_OPEN_DOOR);
-        mIntent.putExtra(BOARD_ID,iBoardId);
-        mIntent.putExtra(LOCK_ID,iLockId);
-        sendBroadcast();
+        Intent intent = new Intent();
+        intent.setAction(Const.REQ_OPEN_DOOR);
+        intent.putExtra(BOARD_ID,iBoardId);
+        intent.putExtra(LOCK_ID,iLockId);
+        mContext.sendBroadcast(intent);
     }
 
     /**
@@ -46,10 +41,11 @@ public class CabinetManager {
      * @param iLockId
      */
     public void getDoorStatus(int iBoardId,int iLockId){
-        mIntent.setAction(Const.REQ_DOOR_STATUS);
-        mIntent.putExtra(BOARD_ID,iBoardId);
-        mIntent.putExtra(LOCK_ID,iLockId);
-        sendBroadcast();
+        Intent intent = new Intent();
+        intent.setAction(Const.REQ_DOOR_STATUS);
+        intent.putExtra(BOARD_ID,iBoardId);
+        intent.putExtra(LOCK_ID,iLockId);
+        mContext.sendBroadcast(intent);
     }
 
     /**
@@ -58,11 +54,12 @@ public class CabinetManager {
      * @param iLockId
      */
     public void getGoodStatus(int iBoardId,int iLockId){
-        mIntent.setAction(Const.REQ_GOODS_STATUS);
-        mIntent.putExtra(BOARD_ID,iBoardId);
-        mIntent.putExtra(LOCK_ID,iLockId);
+        Intent intent = new Intent();
+        intent.setAction(Const.REQ_GOODS_STATUS);
+        intent.putExtra(BOARD_ID,iBoardId);
+        intent.putExtra(LOCK_ID,iLockId);
         Log.d("CabinetBroadcast",Const.REQ_GOODS_STATUS);
-        sendBroadcast();
+        mContext.sendBroadcast(intent);
     }
 
     /**
@@ -70,9 +67,10 @@ public class CabinetManager {
      * @param iBoardId
      */
     public void getGoodsStatus(int iBoardId){
-        mIntent.setAction(Const.REQ_GOODSES_STATUS);
-        mIntent.putExtra(BOARD_ID,iBoardId);
-        mIntent.putExtra(BOXESCOUNTS,8);
-        sendBroadcast();
+        Intent intent = new Intent();
+        intent.setAction(Const.REQ_GOODSES_STATUS);
+        intent.putExtra(BOARD_ID,iBoardId);
+        intent.putExtra(BOXESCOUNTS,8);
+        mContext.sendBroadcast(intent);
     }
 }
