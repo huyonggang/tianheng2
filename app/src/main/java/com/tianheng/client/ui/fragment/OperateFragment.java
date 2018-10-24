@@ -28,6 +28,7 @@ import com.tianheng.client.model.bean.UserBean;
 import com.tianheng.client.model.event.DoorStatusEvent;
 import com.tianheng.client.model.event.DoorsStatusEvent;
 import com.tianheng.client.model.event.GoodStatusEvent;
+import com.tianheng.client.model.event.GoodsStatusEvent;
 import com.tianheng.client.model.event.JPushEvent;
 import com.tianheng.client.model.event.OpenDoorEvent;
 import com.tianheng.client.model.frame.BMSFrame;
@@ -257,8 +258,8 @@ public class OperateFragment extends BaseFragment<OperatePresenter> implements O
     }
 
     @Subscribe
-    public void onEvent(DoorsStatusEvent event) {
-        List<Integer> goods = event.opendArray;
+    public void onEvent(GoodsStatusEvent event) {
+        List<Integer> goods = event.goodsList;
         for (int i = 0; i < goods.size(); i++) {
             if (goods.get(i) == 0) {
                 boxStatuses.get(i).setEmpty(true);
