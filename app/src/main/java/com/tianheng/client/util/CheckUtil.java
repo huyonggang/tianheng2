@@ -72,13 +72,6 @@ public class CheckUtil {
         if (!checkT(bmsFrame.batterieT2)){
             return false;
         }
-        if (!checkCapacity(bmsFrame.capacity)){
-            return false;
-        }
-        if (!checkCapacity(bmsFrame.capacitySum)){
-            return false;
-        }
-
         return true;
     }
 

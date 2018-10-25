@@ -206,7 +206,7 @@ public class OperateFragment extends BaseFragment<OperatePresenter> implements O
                     .subscribe(new Consumer<Long>() {
                         @Override
                         public void accept(Long aLong) throws Exception {
-                            if (status==-1){
+                            if (status == -1) {
                                 mCabinetManager.getGoodStatus(0, 0);
                                 mCabinetManager.getGoodStatus(0, 1);
                                 mCabinetManager.getGoodStatus(0, 2);
