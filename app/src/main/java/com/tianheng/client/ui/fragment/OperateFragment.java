@@ -223,7 +223,7 @@ public class OperateFragment extends BaseFragment<OperatePresenter> implements O
 
     public void schedule() {
         //定时上传数据
-        timer.schedule(task, 10 * 1000, 5 * 60 * 1000);
+        timer.schedule(task, 10 * 1000, 2 * 60 * 1000);
     }
 
     private void initView() {
@@ -625,7 +625,7 @@ public class OperateFragment extends BaseFragment<OperatePresenter> implements O
                     BMSFrame bmsFrame = DecodeFrame.decodeBmsFrame(newFrame);
                     if (bmsFrame != null) {
                         bmsFrame.pageNo = msg.arg1;
-                        mListener.sendFrame(bmsFrame);//上传到服务器
+                        mListener.sendFrame(bmsFrame,newFrame);//上传到服务器
                     }
                     if (status == 3 && bmsFrame != null && mExchangeBean != null && bmsFrame.pageNo == mExchangeBean.getEmptyBoxNumber()) {
                         if (CheckUtil.checkBattery(bmsFrame)) {
@@ -677,7 +677,7 @@ public class OperateFragment extends BaseFragment<OperatePresenter> implements O
 
         void sendFrame(byte[] frame);
 
-        void sendFrame(BMSFrame bmsFrame);
+        void sendFrame(BMSFrame bmsFrame,String frame);
 
         void sendEmptyBox(int boxNum);
     }

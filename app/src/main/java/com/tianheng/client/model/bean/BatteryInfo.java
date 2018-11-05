@@ -21,6 +21,15 @@ public class BatteryInfo {
     private double curPower;//当前电量
     private double curVoltage;//当前电压
     private int chargerStatus;//充电状态0未使用1充电中2放电中
+    private String frame;
+
+    public String getFrame() {
+        return frame;
+    }
+
+    public void setFrame(String frame) {
+        this.frame = frame;
+    }
 
     public String getContent() {
         return content;

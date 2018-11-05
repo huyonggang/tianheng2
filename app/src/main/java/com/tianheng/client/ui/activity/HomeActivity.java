@@ -245,7 +245,7 @@ public class HomeActivity extends BaseActivity<HomePresenter> implements HomeCon
     }
 
     @Override
-    public void sendFrame(BMSFrame bmsFrame) {
+    public void sendFrame(BMSFrame bmsFrame,String frame) {
         Log.d("voltage", bmsFrame.code+"  voltage1->  " + Integer.parseInt(bmsFrame.voltage1, 16));
         Log.d("voltage", bmsFrame.code+"  voltage2->  " + Integer.parseInt(bmsFrame.voltage2, 16));
         Log.d("voltage", bmsFrame.code+"  voltage3->  " + Integer.parseInt(bmsFrame.voltage3, 16));
@@ -271,8 +271,8 @@ public class HomeActivity extends BaseActivity<HomePresenter> implements HomeCon
         batteryInfo.setCurPower(getPower(bmsFrame));
         batteryInfo.setCurVoltage(sumVol(bmsFrame));
         batteryInfo.setChargerStatus(resolveStatus(bmsFrame));
-        String frame = new Gson().toJson(batteryInfo);
-        mDataIntent.putExtra("data", frame);
+        String newFrame = new Gson().toJson(batteryInfo);
+        mDataIntent.putExtra("data", newFrame);
         sendBroadcast(mDataIntent);
     }
 
@@ -286,6 +286,7 @@ public class HomeActivity extends BaseActivity<HomePresenter> implements HomeCon
         batteryInfo.setCurPower(0);
         batteryInfo.setCurVoltage(0);
         batteryInfo.setChargerStatus(2);
+        batteryInfo.setFrame("");
         String frame = new Gson().toJson(batteryInfo);
         mDataIntent.putExtra("data", frame);
         sendBroadcast(mDataIntent);
