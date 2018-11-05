@@ -188,19 +188,19 @@ public class OperateFragment extends BaseFragment<OperatePresenter> implements O
     private void initData() {
         //mPresenter.getQRCode(imei, 200, 200, "png");
 //        boxStatuses.clear();
-//        for (int i = 0; i < 8; i++) {
-//            BoxStatus boxStatus = new BoxStatus();
-//            boxStatus.setEmpty(true);
-//            boxStatus.setBoxNum(i);
-//            boxStatuses.add(boxStatus);
-//        }
+        for (int i = 0; i < 8; i++) {
+            BoxStatus boxStatus = new BoxStatus();
+            boxStatus.setEmpty(true);
+            boxStatus.setBoxNum(i);
+            boxStatuses.add(boxStatus);
+        }
         // initDispose();
 
     }
 
     public void initDispose() {
         if (boxDisposable == null || boxDisposable.isDisposed()) {
-            boxDisposable = Observable.interval(20, 5 * 60, TimeUnit.SECONDS)
+            boxDisposable = Observable.interval(20, 4 * 60, TimeUnit.SECONDS)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(new Consumer<Long>() {
@@ -223,7 +223,7 @@ public class OperateFragment extends BaseFragment<OperatePresenter> implements O
 
     public void schedule() {
         //定时上传数据
-        timer.schedule(task, 10 * 1000, 2 * 60 * 1000);
+        timer.schedule(task, 2 * 60 * 1000, 4 * 60 * 1000);
     }
 
     private void initView() {
@@ -441,7 +441,7 @@ public class OperateFragment extends BaseFragment<OperatePresenter> implements O
                 closeDialog();
                 mPresenter.closeOld(mExchangeBean.getLeaseBatteryNumber(), mExchangeBean.getEmptyBoxNumber());
             } else if (status == -1) {
-                searchPackage(lockId);
+                boxStatuses.get(lockId).setEmpty(false);
             }
         } else {
             if (status == 2 && lockId == mExchangeBean.getEmptyBoxNumber()) {
@@ -468,7 +468,7 @@ public class OperateFragment extends BaseFragment<OperatePresenter> implements O
                 mInputCode.setText("");
 
             } else if (status == -1) {
-                mListener.sendEmptyBox(lockId);
+                boxStatuses.get(lockId).setEmpty(true);
             }
         }
     }
@@ -625,7 +625,7 @@ public class OperateFragment extends BaseFragment<OperatePresenter> implements O
                     BMSFrame bmsFrame = DecodeFrame.decodeBmsFrame(newFrame);
                     if (bmsFrame != null) {
                         bmsFrame.pageNo = msg.arg1;
-                        mListener.sendFrame(bmsFrame,newFrame);//上传到服务器
+                        mListener.sendFrame(bmsFrame, newFrame);//上传到服务器
                     }
                     if (status == 3 && bmsFrame != null && mExchangeBean != null && bmsFrame.pageNo == mExchangeBean.getEmptyBoxNumber()) {
                         if (CheckUtil.checkBattery(bmsFrame)) {
@@ -677,7 +677,7 @@ public class OperateFragment extends BaseFragment<OperatePresenter> implements O
 
         void sendFrame(byte[] frame);
 
-        void sendFrame(BMSFrame bmsFrame,String frame);
+        void sendFrame(BMSFrame bmsFrame, String frame);
 
         void sendEmptyBox(int boxNum);
     }
