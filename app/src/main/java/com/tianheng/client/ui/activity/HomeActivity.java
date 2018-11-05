@@ -255,6 +255,7 @@ public class HomeActivity extends BaseActivity<HomePresenter> implements HomeCon
         batteryInfo.setCurPower(getPower(bmsFrame));
         batteryInfo.setCurVoltage(sumVol(bmsFrame));
         batteryInfo.setChargerStatus(resolveStatus(bmsFrame));
+        batteryInfo.setFrame(frame);
         String newFrame = new Gson().toJson(batteryInfo);
         mDataIntent.putExtra("data", newFrame);
         sendBroadcast(mDataIntent);
