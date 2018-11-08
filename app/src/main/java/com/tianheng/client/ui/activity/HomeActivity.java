@@ -94,6 +94,7 @@ public class HomeActivity extends BaseActivity<HomePresenter> implements HomeCon
     private Intent mDataIntent = new Intent();
     private List<Uri> mUris = new ArrayList<>();
     private int i = 0;
+    private static final String TAG ="HomeActivity";
 
     @Override
     protected void initInject() {
@@ -226,12 +227,14 @@ public class HomeActivity extends BaseActivity<HomePresenter> implements HomeCon
         mVideoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
             @Override
             public void onPrepared(MediaPlayer mp) {
+                Log.d(TAG,"onPrepared");
                 mVideoView.start();
             }
         });
         mVideoView.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
             @Override
             public void onCompletion(MediaPlayer mp) {
+                Log.d(TAG,"onCompletion");
                 i++;
                 if (i == mUris.size()) {
                     i = 0;
@@ -244,6 +247,7 @@ public class HomeActivity extends BaseActivity<HomePresenter> implements HomeCon
             @Override
             public boolean onError(MediaPlayer mp, int what, int extra) {
                 stopPlaybackVideo();
+                Log.d(TAG,"onError");
                 return true;
             }
         });
@@ -253,6 +257,7 @@ public class HomeActivity extends BaseActivity<HomePresenter> implements HomeCon
         mVideoView.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
+                Log.d(TAG,"onTouch");
                 mVideoView.setVisibility(View.GONE);
                 return false;
             }
