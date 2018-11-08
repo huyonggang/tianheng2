@@ -579,6 +579,7 @@ public class OperateFragment extends BaseFragment<OperatePresenter> implements O
         ToastUtil.show(getActivity(), "完成交易", Toast.LENGTH_SHORT);
         sendCloseMessage();
         mPresenter.logout(App.getInstance().getTicket());
+        App.getInstance().setTicket("");
         hindKeyboard();
         mInputCode.setText("");
     }
