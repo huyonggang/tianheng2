@@ -28,22 +28,4 @@ public class HomePresenter extends RxPresenter<HomeContract.View> implements Hom
         this.mApiFactory = apiFactory;
     }
 
-    @Override
-    public void getPicture(int imageSize) {
-        Disposable disposable = mApiFactory.getOtherApi().getBannerImages()
-                .compose(RxSchedulers.io_main())
-                .compose(RxResult.handleResult())
-                .subscribe(new Consumer<List<AdBean>>() {
-                    @Override
-                    public void accept(List<AdBean> images) throws Exception {
-                        if (images != null && images.size() > 0) {
-                            mView.showImage(images);
-                        }
-                    }
-                }, new RxException<>(e -> {
-                    e.printStackTrace();
-                }
-                ));
-        addDispose(disposable);
-    }
 }

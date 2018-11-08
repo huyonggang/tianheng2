@@ -7,6 +7,8 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.media.MediaPlayer;
+import android.net.Uri;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
@@ -17,6 +19,7 @@ import android.support.v7.app.AlertDialog;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -41,6 +44,7 @@ import com.tianheng.client.ui.fragment.OperateFragment;
 import com.tianheng.client.util.DataUtils;
 import com.tianheng.client.util.GlideImageLoader;
 import com.tianheng.client.util.ToastUtil;
+import com.tianheng.client.wedget.CustomerVideoView;
 import com.tianheng.client.wedget.loading.ShapeLoadingDialog;
 import com.youth.banner.Banner;
 import com.youth.banner.BannerConfig;
@@ -69,8 +73,8 @@ public class HomeActivity extends BaseActivity<HomePresenter> implements HomeCon
 
     @BindView(R.id.fragment)
     FrameLayout mFrame;
-    @BindView(R.id.banner)
-    Banner mBanner;
+    @BindView(R.id.video)
+    CustomerVideoView mVideoView;
 
     private OperateFragment mOperateFragment;
     private FragmentManager mFragmentManager;
@@ -88,6 +92,8 @@ public class HomeActivity extends BaseActivity<HomePresenter> implements HomeCon
     private CabinetManager mCabinetManager;
     private Disposable disposable;
     private Intent mDataIntent = new Intent();
+    private List<Uri> mUris = new ArrayList<>();
+    private int i = 0;
 
     @Override
     protected void initInject() {
@@ -110,6 +116,25 @@ public class HomeActivity extends BaseActivity<HomePresenter> implements HomeCon
         initData();
         initView();
         initCabinetManager();
+        initDispose();
+    }
+
+    private void initDispose() {
+        if (disposable == null || disposable.isDisposed()) {
+            disposable = Observable.interval(0, 20, TimeUnit.SECONDS)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(new Consumer<Long>() {
+                        @Override
+                        public void accept(Long aLong) throws Exception {
+                            if (TextUtils.isEmpty(App.getInstance().getTicket())) {
+                                mVideoView.setVisibility(View.VISIBLE);
+                            } else {
+                                mVideoView.setVisibility(View.GONE);
+                            }
+                        }
+                    });
+        }
     }
 
     private void initIntent() {
@@ -130,8 +155,40 @@ public class HomeActivity extends BaseActivity<HomePresenter> implements HomeCon
 
     private void initData() {
         getImei();
-        mPresenter.getPicture(4);
+        initVideoPath();
     }
+
+
+    private void initVideoPath() {
+        mUris.clear();
+        mUris.add(Uri.parse("android.resource://" + getPackageName() + "/raw/" + R.raw.video_1_1));
+        mUris.add(Uri.parse("android.resource://" + getPackageName() + "/raw/" + R.raw.video_1_2));
+        mUris.add(Uri.parse("android.resource://" + getPackageName() + "/raw/" + R.raw.video_1_3));
+        mUris.add(Uri.parse("android.resource://" + getPackageName() + "/raw/" + R.raw.video_1_4));
+        mUris.add(Uri.parse("android.resource://" + getPackageName() + "/raw/" + R.raw.video_1_5));
+        mUris.add(Uri.parse("android.resource://" + getPackageName() + "/raw/" + R.raw.video_1_6));
+        mUris.add(Uri.parse("android.resource://" + getPackageName() + "/raw/" + R.raw.video_1_7));
+        mUris.add(Uri.parse("android.resource://" + getPackageName() + "/raw/" + R.raw.video_1_8));
+        mUris.add(Uri.parse("android.resource://" + getPackageName() + "/raw/" + R.raw.video_1_9));
+        mUris.add(Uri.parse("android.resource://" + getPackageName() + "/raw/" + R.raw.video_2_1));
+        mUris.add(Uri.parse("android.resource://" + getPackageName() + "/raw/" + R.raw.video_2_2));
+        mUris.add(Uri.parse("android.resource://" + getPackageName() + "/raw/" + R.raw.video_2_3));
+        mUris.add(Uri.parse("android.resource://" + getPackageName() + "/raw/" + R.raw.video_3_1));
+        mUris.add(Uri.parse("android.resource://" + getPackageName() + "/raw/" + R.raw.video_3_2));
+        mUris.add(Uri.parse("android.resource://" + getPackageName() + "/raw/" + R.raw.video_3_3));
+        mUris.add(Uri.parse("android.resource://" + getPackageName() + "/raw/" + R.raw.video_3_4));
+        mUris.add(Uri.parse("android.resource://" + getPackageName() + "/raw/" + R.raw.video_3_5));
+        mUris.add(Uri.parse("android.resource://" + getPackageName() + "/raw/" + R.raw.video_3_6));
+        mUris.add(Uri.parse("android.resource://" + getPackageName() + "/raw/" + R.raw.video_3_7));
+        mUris.add(Uri.parse("android.resource://" + getPackageName() + "/raw/" + R.raw.video_3_8));
+        mUris.add(Uri.parse("android.resource://" + getPackageName() + "/raw/" + R.raw.video_4_1));
+        mUris.add(Uri.parse("android.resource://" + getPackageName() + "/raw/" + R.raw.video_4_2));
+        mUris.add(Uri.parse("android.resource://" + getPackageName() + "/raw/" + R.raw.video_4_3));
+        mUris.add(Uri.parse("android.resource://" + getPackageName() + "/raw/" + R.raw.video_4_4));
+        mUris.add(Uri.parse("android.resource://" + getPackageName() + "/raw/" + R.raw.video_4_5));
+        mUris.add(Uri.parse("android.resource://" + getPackageName() + "/raw/" + R.raw.video_4_10));
+    }
+
 
     private void getImei() {
         TelephonyManager telephonyManager = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
@@ -146,7 +203,7 @@ public class HomeActivity extends BaseActivity<HomePresenter> implements HomeCon
     private void initService() {
         serviceIn.setClass(this, SClientService.class);
         portIn.setClass(this, SerialPortService.class);
-        bindService(portIn, mConnection, BIND_AUTO_CREATE);
+        //bindService(portIn, mConnection, BIND_AUTO_CREATE);
         //bindService(serviceIn, mClientConn, BIND_AUTO_CREATE);
     }
 
@@ -159,10 +216,49 @@ public class HomeActivity extends BaseActivity<HomePresenter> implements HomeCon
     }
 
     private void initView() {
+        initVideoView();
         initFragment();
-        initBanner();
         initDialog();
     }
+
+
+    private void initVideoView() {
+        mVideoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+            @Override
+            public void onPrepared(MediaPlayer mp) {
+                mVideoView.start();
+            }
+        });
+        mVideoView.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+            @Override
+            public void onCompletion(MediaPlayer mp) {
+                i++;
+                if (i == mUris.size()) {
+                    i = 0;
+                }
+                mVideoView.setVideoURI(mUris.get(i));
+                mVideoView.start();
+            }
+        });
+        mVideoView.setOnErrorListener(new MediaPlayer.OnErrorListener() {
+            @Override
+            public boolean onError(MediaPlayer mp, int what, int extra) {
+                stopPlaybackVideo();
+                return true;
+            }
+        });
+
+        mVideoView.setVideoURI(mUris.get(i));
+
+        mVideoView.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                mVideoView.setVisibility(View.GONE);
+                return false;
+            }
+        });
+    }
+
 
     private ServiceConnection mClientConn = new ServiceConnection() {
         @Override
@@ -200,24 +296,6 @@ public class HomeActivity extends BaseActivity<HomePresenter> implements HomeCon
     }
 
 
-    private void initBanner() {
-        mBanner.setImageLoader(new GlideImageLoader());
-        //设置自动轮播，默认为true
-        mBanner.isAutoPlay(true);
-        //设置轮播时间
-        mBanner.setDelayTime(5 * 1000);
-        //设置指示器位置（当banner模式中有指示器时）
-        mBanner.setIndicatorGravity(BannerConfig.RIGHT);
-        mBanner.setBannerStyle(BannerConfig.CIRCLE_INDICATOR);
-        mBanner.setOnBannerListener(new OnBannerListener() {
-            @Override
-            public void OnBannerClick(int position) {
-                mBanner.setVisibility(View.GONE);
-            }
-        });
-    }
-
-
     private void initDialog() {
         mBuilder = new ShapeLoadingDialog.Builder(this);
     }
@@ -225,6 +303,17 @@ public class HomeActivity extends BaseActivity<HomePresenter> implements HomeCon
     @Override
     protected void onResume() {
         super.onResume();
+        if (!mVideoView.isPlaying()) {
+            mVideoView.resume();
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (mVideoView.canPause()) {
+            mVideoView.pause();
+        }
     }
 
     @Override
@@ -246,7 +335,7 @@ public class HomeActivity extends BaseActivity<HomePresenter> implements HomeCon
     }
 
     @Override
-    public void sendFrame(BMSFrame bmsFrame,String frame) {
+    public void sendFrame(BMSFrame bmsFrame, String frame) {
         BatteryInfo batteryInfo = new BatteryInfo();
         batteryInfo.setType(1);
         batteryInfo.setCabinetNumber(App.getInstance().getImei());
@@ -286,6 +375,7 @@ public class HomeActivity extends BaseActivity<HomePresenter> implements HomeCon
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        stopPlaybackVideo();
         if (disposable != null) {
             disposable.dispose();
         }
@@ -294,30 +384,11 @@ public class HomeActivity extends BaseActivity<HomePresenter> implements HomeCon
         //unbindService(mConnection);
     }
 
-    @Override
-    public void showImage(List<AdBean> adBeans) {
-        if (adBeans.size() > 0 && TextUtils.isEmpty(App.getInstance().getTicket())) {
-            for (AdBean adBean : adBeans) {
-                images.add(adBean.getImgUrl());
-            }
-            mBanner.setImages(images);
-            mBanner.start();
-        }
-
-        if (disposable == null || disposable.isDisposed()) {
-            disposable = Observable.interval(0, 20, TimeUnit.SECONDS)
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(new Consumer<Long>() {
-                        @Override
-                        public void accept(Long aLong) throws Exception {
-                            if (TextUtils.isEmpty(App.getInstance().getTicket()) && adBeans != null && adBeans.size() > 0) {
-                                mBanner.setVisibility(View.VISIBLE);
-                            } else {
-
-                            }
-                        }
-                    });
+    private void stopPlaybackVideo() {
+        try {
+            mVideoView.stopPlayback();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 

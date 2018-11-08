@@ -12,8 +12,8 @@
 
     </FrameLayout>
 
-    <com.youth.banner.Banner
-        android:id="@+id/banner"
+    <com.tianheng.client.wedget.CustomerVideoView
+        android:id="@+id/video"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 

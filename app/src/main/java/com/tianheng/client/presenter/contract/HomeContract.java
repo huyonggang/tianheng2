@@ -15,10 +15,8 @@ public interface HomeContract {
 
     interface View extends BaseView {
 
-        void showImage(List<AdBean> images);
     }
 
     interface Presenter extends BasePresenter<View>{
-        void getPicture(int imageSize);
     }
 }
