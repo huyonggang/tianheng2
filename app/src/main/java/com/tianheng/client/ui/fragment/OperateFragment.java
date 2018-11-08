@@ -580,6 +580,7 @@ public class OperateFragment extends BaseFragment<OperatePresenter> implements O
         sendCloseMessage();
         mPresenter.logout(App.getInstance().getTicket());
         hindKeyboard();
+        App.getInstance().setTicket("");
         mInputCode.setText("");
     }
 
