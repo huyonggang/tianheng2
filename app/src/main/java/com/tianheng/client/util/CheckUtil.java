@@ -80,6 +80,11 @@ public class CheckUtil {
         return num > Const.LOW_VOLTAGE;
     }
 
+    public static boolean checkVoltageH(String voltage) {
+        int num = Integer.parseInt(voltage, 16);
+        return num > Const.HEIGHT_VOLTAGE;
+    }
+
     public static boolean checkT(String temperature) {
         int num = Integer.parseInt(temperature, 16);
         if (num > Const.LOW_T && num < Const.HEIGHT_T) {

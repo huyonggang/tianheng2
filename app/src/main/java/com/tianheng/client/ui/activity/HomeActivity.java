@@ -38,6 +38,7 @@ import com.tianheng.client.presenter.contract.HomeContract;
 import com.tianheng.client.service.SClientService;
 import com.tianheng.client.service.SerialPortService;
 import com.tianheng.client.ui.fragment.OperateFragment;
+import com.tianheng.client.util.CheckUtil;
 import com.tianheng.client.util.DataUtils;
 import com.tianheng.client.util.GlideImageLoader;
 import com.tianheng.client.util.ToastUtil;
@@ -246,7 +247,7 @@ public class HomeActivity extends BaseActivity<HomePresenter> implements HomeCon
     }
 
     @Override
-    public void sendFrame(BMSFrame bmsFrame,String frame) {
+    public void sendFrame(BMSFrame bmsFrame, String frame) {
         BatteryInfo batteryInfo = new BatteryInfo();
         batteryInfo.setType(1);
         batteryInfo.setCabinetNumber(App.getInstance().getImei());
@@ -337,10 +338,40 @@ public class HomeActivity extends BaseActivity<HomePresenter> implements HomeCon
             status = 1;//充满
         } else if ("00000001".equals(statusStr)) {
             status = 0;//充电中
+        } else if ("00000003".equals(statusStr)) {
+            if (checkVoltage(bmsFrame)) {//如果电压超过4.25v
+                status = 2;
+            } else {
+                status = 1;
+            }
         } else {
             status = 2;
         }
         return status;
+    }
+
+    private boolean checkVoltage(BMSFrame bmsFrame) {
+        if (CheckUtil.checkVoltageH(bmsFrame.voltage1)
+                || CheckUtil.checkVoltageH(bmsFrame.voltage1)
+                || CheckUtil.checkVoltageH(bmsFrame.voltage2)
+                || CheckUtil.checkVoltageH(bmsFrame.voltage3)
+                || CheckUtil.checkVoltageH(bmsFrame.voltage4)
+                || CheckUtil.checkVoltageH(bmsFrame.voltage5)
+                || CheckUtil.checkVoltageH(bmsFrame.voltage6)
+                || CheckUtil.checkVoltageH(bmsFrame.voltage7)
+                || CheckUtil.checkVoltageH(bmsFrame.voltage8)
+                || CheckUtil.checkVoltageH(bmsFrame.voltage9)
+                || CheckUtil.checkVoltageH(bmsFrame.voltage10)
+                || CheckUtil.checkVoltageH(bmsFrame.voltage11)
+                || CheckUtil.checkVoltageH(bmsFrame.voltage12)
+                || CheckUtil.checkVoltageH(bmsFrame.voltage13)
+                || CheckUtil.checkVoltageH(bmsFrame.voltage14)
+                || CheckUtil.checkVoltageH(bmsFrame.voltage15)
+                || CheckUtil.checkVoltageH(bmsFrame.voltage16)
+                ) {
+            return true;
+        }
+        return false;
     }
 
     public double sumVol(BMSFrame bmsFrame) {

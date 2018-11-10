@@ -39,7 +39,7 @@ public class Const {
     public static final String FRAME_78 = "783C";
 
     public static final int LOW_VOLTAGE = 2700;
-    public static final int HEIGHT_VOLTAGE = 4300;
+    public static final int HEIGHT_VOLTAGE = 4250;
 
     public static final int LOW_T = 5;
     public static final int HEIGHT_T = 65;
