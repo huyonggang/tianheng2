@@ -335,15 +335,18 @@ public class HomeActivity extends BaseActivity<HomePresenter> implements HomeCon
         int status;
         String statusStr = bmsFrame.status;
         if ("00000000".equals(statusStr)) {
-            status = 1;//充满
+            status = 0;//充电中
         } else if ("00000001".equals(statusStr)) {
             status = 0;//充电中
         } else if ("00000003".equals(statusStr)) {
-            if (checkVoltage(bmsFrame)) {//如果电压超过4.25v
+            status = 1;//充满
+        } else if ("00000008".equals(statusStr)) {
+            if (checkVoltage(bmsFrame)) {
                 status = 2;
             } else {
                 status = 1;
             }
+
         } else {
             status = 2;
         }
