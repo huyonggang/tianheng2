@@ -477,7 +477,8 @@ public class OperateFragment extends BaseFragment<OperatePresenter> implements O
             } else if (status == 1) {
                 status = -1;
                 sendCloseMessage();
-                ToastUtil.showLong(mContext, "柜子有电池，请重新操作");
+                ToastUtil.showLong(mContext, "系统错误，请十秒钟后重新操作");
+                searchPackage(mExchangeBean.getEmptyBoxNumber());
                 mPresenter.logout(App.getInstance().getTicket());
                 App.getInstance().setTicket("");
                 mInputCode.setText("");
