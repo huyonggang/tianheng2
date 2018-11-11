@@ -114,8 +114,8 @@ public class OperatePresenter extends RxPresenter<OperateContract.View> implemen
                         if (response.isSuccess()) {
                             mView.closeOldSuccess();
                         }else{
+                            mView.closeOldFail(emptyBoxNumber);
                             mView.showContent(response.getMessage());
-
                         }
 
                     }
@@ -123,6 +123,7 @@ public class OperatePresenter extends RxPresenter<OperateContract.View> implemen
                     @Override
                     public void accept(Throwable throwable) throws Exception {
                         mView.closeDialog();
+                        mView.closeOldFail(emptyBoxNumber);
                         mView.showContent(throwable.getMessage());
                     }
                 });

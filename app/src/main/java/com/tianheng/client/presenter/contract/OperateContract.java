@@ -20,6 +20,8 @@ public interface OperateContract {
 
         void openDoor(ExchangeBean exchangeBean);
         void closeOldSuccess();
+        void closeOldFail(int box);
+
         void closeNewSuccess();
         void closeNewFail(int box);
         void closeDialog();

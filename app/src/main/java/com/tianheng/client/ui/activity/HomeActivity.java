@@ -105,7 +105,7 @@ public class HomeActivity extends BaseActivity<HomePresenter> implements HomeCon
 
     @Override
     protected void init() {
-        initBroad();
+       // initBroad();
         initIntent();
         initService();
         initData();
@@ -335,9 +335,9 @@ public class HomeActivity extends BaseActivity<HomePresenter> implements HomeCon
         int status;
         String statusStr = bmsFrame.status;
         if ("00000000".equals(statusStr)) {
-            if (sumVol(bmsFrame)>67.2){
-                status=1;
-            }else{
+            if (sumVol(bmsFrame) > 66.95) {
+                status = 1;
+            } else {
                 status = 0;//充电中
             }
 
