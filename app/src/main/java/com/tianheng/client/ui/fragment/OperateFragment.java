@@ -251,18 +251,8 @@ public class OperateFragment extends BaseFragment<OperatePresenter> implements O
     public void onEvent(JPushEvent event) {
         App.getInstance().setTicket(event.getTicket());
         this.mExchangeBean = event.getExchangeBean();
-        sendCloseMessage();
-        sendShowMessage("正在打开箱门，请稍后...");
-        Log.d(TAG, "正在打开箱门    " + status);
-        Log.d(TAG, "正在打开箱门    " + mExchangeBean.toString());
-        if (mExchangeBean.getEmptyBoxNumber() == -1) {
-            status = 5;
-            mCabinetManager.openDoor(0, mExchangeBean.getExchangeBoxNumber());
-        } else {
-            status = 1;
-            mCabinetManager.openDoor(0, mExchangeBean.getEmptyBoxNumber());
-        }
-
+        status = 1;
+        mCabinetManager.getGoodStatus(0, mExchangeBean.getEmptyBoxNumber());
     }
 
     @Subscribe
@@ -487,7 +477,7 @@ public class OperateFragment extends BaseFragment<OperatePresenter> implements O
             } else if (status == 1) {
                 status = -1;
                 sendCloseMessage();
-                ToastUtil.showLong(mContext, "柜子有电池，请重新扫码");
+                ToastUtil.showLong(mContext, "柜子有电池，请重新操作");
                 mPresenter.logout(App.getInstance().getTicket());
                 App.getInstance().setTicket("");
                 mInputCode.setText("");
@@ -837,7 +827,7 @@ public class OperateFragment extends BaseFragment<OperatePresenter> implements O
         this.mExchangeBean = subscribeBean.getExchangeModel();
 
         status = 1;
-        mCabinetManager.getDoorStatus(0, mExchangeBean.getEmptyBoxNumber());
+        mCabinetManager.getGoodStatus(0, mExchangeBean.getEmptyBoxNumber());
 
     }
 

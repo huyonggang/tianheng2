@@ -336,13 +336,17 @@ public class HomeActivity extends BaseActivity<HomePresenter> implements HomeCon
         String statusStr = bmsFrame.status;
         if ("00000000".equals(statusStr)) {
             if (sumVol(bmsFrame) > 66.95) {
-                status = 1;
+                status = 1; //充满
             } else {
                 status = 0;//充电中
             }
 
         } else if ("00000001".equals(statusStr)) {
-            status = 0;//充电中
+            if (sumVol(bmsFrame) > 67.2) {
+                status = 1;//充满
+            } else {
+                status = 0;//充电中
+            }
         } else if ("00000003".equals(statusStr)) {
             status = 1;//充满
         } else if ("00000008".equals(statusStr)) {
