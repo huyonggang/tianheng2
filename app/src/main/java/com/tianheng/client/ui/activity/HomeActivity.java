@@ -335,14 +335,9 @@ public class HomeActivity extends BaseActivity<HomePresenter> implements HomeCon
         int status;
         String statusStr = bmsFrame.status;
         if ("00000000".equals(statusStr)) {
-            if (sumVol(bmsFrame) > 66.95) {
-                status = 1; //充满
-            } else {
-                status = 0;//充电中
-            }
-
+            status = 1; //充满
         } else if ("00000001".equals(statusStr)) {
-            if (sumVol(bmsFrame) > 67.2) {
+            if (sumVol(bmsFrame) > 67.19) {
                 status = 1;//充满
             } else {
                 status = 0;//充电中
@@ -350,12 +345,11 @@ public class HomeActivity extends BaseActivity<HomePresenter> implements HomeCon
         } else if ("00000003".equals(statusStr)) {
             status = 1;//充满
         } else if ("00000008".equals(statusStr)) {
-            if (checkVoltage(bmsFrame)) {
-                status = 2;
+            if (sumVol(bmsFrame) > 64&&sumVol(bmsFrame)<68) {
+                status = 1;//充满
             } else {
-                status = 1;
+                status = 2;//故障
             }
-
         } else {
             status = 2;
         }
