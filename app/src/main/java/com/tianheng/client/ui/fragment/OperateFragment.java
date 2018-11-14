@@ -252,6 +252,7 @@ public class OperateFragment extends BaseFragment<OperatePresenter> implements O
         App.getInstance().setTicket(event.getTicket());
         this.mExchangeBean = event.getExchangeBean();
         status = 1;
+        mQRCode.setVisibility(View.GONE);
         mCabinetManager.getGoodStatus(0, mExchangeBean.getEmptyBoxNumber());
     }
 
@@ -476,8 +477,8 @@ public class OperateFragment extends BaseFragment<OperatePresenter> implements O
                 boxStatuses.get(lockId).setEmpty(false);
             } else if (status == 1) {
                 status = -1;
-                sendCloseMessage();
-                ToastUtil.showLong(mContext, "系统错误，请十秒钟后重新操作");
+                mQRCode.setVisibility(View.VISIBLE);
+                showContent("系统错误，请十秒钟后重新操作");
                 searchPackage(mExchangeBean.getEmptyBoxNumber());
                 mPresenter.logout(App.getInstance().getTicket());
                 App.getInstance().setTicket("");
@@ -491,6 +492,7 @@ public class OperateFragment extends BaseFragment<OperatePresenter> implements O
                 }
                 sendCloseMessage();
                 status = -1;
+                mQRCode.setVisibility(View.VISIBLE);
             } else if (status == 6 && event.iLockId == mExchangeBean.getExchangeBoxNumber()) {
                 if (disposable != null) {
                     disposable.dispose();
@@ -503,6 +505,7 @@ public class OperateFragment extends BaseFragment<OperatePresenter> implements O
                     disposable.dispose();
                 }
                 status = -1;
+                mQRCode.setVisibility(View.VISIBLE);
                 sendCloseMessage();
                 mPresenter.logout(App.getInstance().getTicket());
                 App.getInstance().setTicket("");
@@ -645,6 +648,7 @@ public class OperateFragment extends BaseFragment<OperatePresenter> implements O
     @Override
     public void closeNewSuccess() {
         status = -1;//完成操作
+        mQRCode.setVisibility(View.VISIBLE);
         ToastUtil.show(getActivity(), "完成交易", Toast.LENGTH_SHORT);
         sendCloseMessage();
         mPresenter.logout(App.getInstance().getTicket());
@@ -826,7 +830,7 @@ public class OperateFragment extends BaseFragment<OperatePresenter> implements O
     public void subscribeSuccess(SubscribeBean subscribeBean) {
         App.getInstance().setTicket(subscribeBean.getTicket());
         this.mExchangeBean = subscribeBean.getExchangeModel();
-
+        mQRCode.setVisibility(View.GONE);
         status = 1;
         mCabinetManager.getGoodStatus(0, mExchangeBean.getEmptyBoxNumber());
 

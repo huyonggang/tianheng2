@@ -76,6 +76,7 @@ public class OperatePresenter extends RxPresenter<OperateContract.View> implemen
                         if (baseHttpResponse.isSuccess()) {
                             mView.closeNewSuccess();
                         }else{
+                            mView.showContent(baseHttpResponse.getMessage());
                             mView.closeNewFail(exchangeBoxNumber);
                         }
 
@@ -84,6 +85,7 @@ public class OperatePresenter extends RxPresenter<OperateContract.View> implemen
                     @Override
                     public void accept(Throwable throwable) throws Exception {
                         mView.closeNewFail(exchangeBoxNumber);
+                        mView.showContent("订单结束失败");
                         mView.closeDialog();
                     }
                 });
