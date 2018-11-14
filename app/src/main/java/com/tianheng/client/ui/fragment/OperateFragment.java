@@ -499,7 +499,8 @@ public class OperateFragment extends BaseFragment<OperatePresenter> implements O
                 }
                 sendCloseMessage();
                 Log.d(TAG, "关闭箱门,无物体    " + status);
-
+                mQRCode.setVisibility(View.VISIBLE);
+                status=-1;
             } else if (status == 12 && lockId == mExchangeBean.getEmptyBoxNumber()) {
                 if (disposable != null) {
                     disposable.dispose();
