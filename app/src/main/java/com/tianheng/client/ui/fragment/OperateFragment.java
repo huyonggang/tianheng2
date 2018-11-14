@@ -499,7 +499,7 @@ public class OperateFragment extends BaseFragment<OperatePresenter> implements O
                 }
                 sendCloseMessage();
                 Log.d(TAG, "关闭箱门,无物体    " + status);
-                mPresenter.closeNew(mExchangeBean.getExchangeBoxNumber(), mExchangeBean.getExchangeBatteryNumber());
+
             } else if (status == 12 && lockId == mExchangeBean.getEmptyBoxNumber()) {
                 if (disposable != null) {
                     disposable.dispose();
@@ -625,6 +625,7 @@ public class OperateFragment extends BaseFragment<OperatePresenter> implements O
         sendCloseMessage();
         sendShowMessage("打开柜门中...");
         mCabinetManager.openDoor(0, mExchangeBean.getExchangeBoxNumber());
+        mPresenter.closeNew(mExchangeBean.getExchangeBoxNumber(), mExchangeBean.getExchangeBatteryNumber());
     }
 
     @Override
@@ -647,10 +648,6 @@ public class OperateFragment extends BaseFragment<OperatePresenter> implements O
 
     @Override
     public void closeNewSuccess() {
-        status = -1;//完成操作
-        mQRCode.setVisibility(View.VISIBLE);
-        ToastUtil.show(getActivity(), "完成交易", Toast.LENGTH_SHORT);
-        sendCloseMessage();
         mPresenter.logout(App.getInstance().getTicket());
         App.getInstance().setTicket("");
         mInputCode.setText("");
@@ -661,6 +658,9 @@ public class OperateFragment extends BaseFragment<OperatePresenter> implements O
     public void closeNewFail(int box) {
         mCabinetManager.openDoor(0, box);
         status = 21;//网络请求失败
+        if (disposable!=null){
+            disposable.dispose();
+        }
         if (disposable == null || disposable.isDisposed()) {
             disposable = Observable.interval(3, 4, TimeUnit.SECONDS)
                     .subscribeOn(Schedulers.io())
