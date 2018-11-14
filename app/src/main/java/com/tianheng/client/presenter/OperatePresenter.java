@@ -1,6 +1,7 @@
 package com.tianheng.client.presenter;
 
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.tianheng.client.App;
 import com.tianheng.client.base.RxPresenter;
@@ -61,6 +62,7 @@ public class OperatePresenter extends RxPresenter<OperateContract.View> implemen
 
     @Override
     public void closeNew(int exchangeBoxNumber,String exchangeBatteryNumber) {
+        Log.d(getClass().getSimpleName(),"exchangeBoxNumber"+exchangeBoxNumber+"   "+exchangeBatteryNumber);
         Disposable disposable = mApiFactory.getOperateApi().closeNew(App.getInstance().getImei(),exchangeBoxNumber,exchangeBatteryNumber)
                 .compose(RxSchedulers.io_main())
                 .doOnSubscribe(new Consumer<Disposable>() {
