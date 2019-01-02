@@ -50,6 +50,7 @@ import com.youth.banner.listener.OnBannerListener;
 import org.greenrobot.eventbus.Subscribe;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -81,7 +82,7 @@ public class HomeActivity extends BaseActivity<HomePresenter> implements HomeCon
     private Intent mIntent = new Intent();
     private TextView mSubView;
     private TextView mTitleView;
-    private List<String> images = new ArrayList<>();
+    private List<Integer> images = new ArrayList<>();
     private SerialPortService mPortService;
     private SClientService mClientService;
     private ShapeLoadingDialog mDialog;
@@ -89,6 +90,7 @@ public class HomeActivity extends BaseActivity<HomePresenter> implements HomeCon
     private CabinetManager mCabinetManager;
     private Disposable disposable;
     private Intent mDataIntent = new Intent();
+    private int[] attrs = {R.mipmap.img1,R.mipmap.img2,R.mipmap.img3,R.mipmap.img4,R.mipmap.img5,R.mipmap.img6};
 
     @Override
     protected void initInject() {
@@ -131,7 +133,7 @@ public class HomeActivity extends BaseActivity<HomePresenter> implements HomeCon
 
     private void initData() {
         getImei();
-        mPresenter.getPicture(4);
+        //mPresenter.getPicture(4);
     }
 
     private void getImei() {
@@ -216,6 +218,25 @@ public class HomeActivity extends BaseActivity<HomePresenter> implements HomeCon
                 mBanner.setVisibility(View.GONE);
             }
         });
+        mBanner.setImages(Arrays.asList(attrs));
+        mBanner.start();
+
+
+        if (disposable == null || disposable.isDisposed()) {
+            disposable = Observable.interval(0, 20, TimeUnit.SECONDS)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(new Consumer<Long>() {
+                        @Override
+                        public void accept(Long aLong) throws Exception {
+                            if (TextUtils.isEmpty(App.getInstance().getTicket())) {
+                                mBanner.setVisibility(View.VISIBLE);
+                            } else {
+
+                            }
+                        }
+                    });
+        }
     }
 
 
@@ -297,29 +318,29 @@ public class HomeActivity extends BaseActivity<HomePresenter> implements HomeCon
 
     @Override
     public void showImage(List<AdBean> adBeans) {
-        if (adBeans.size() > 0 && TextUtils.isEmpty(App.getInstance().getTicket())) {
-            for (AdBean adBean : adBeans) {
-                images.add(adBean.getImgUrl());
-            }
-            mBanner.setImages(images);
-            mBanner.start();
-        }
-
-        if (disposable == null || disposable.isDisposed()) {
-            disposable = Observable.interval(0, 20, TimeUnit.SECONDS)
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(new Consumer<Long>() {
-                        @Override
-                        public void accept(Long aLong) throws Exception {
-                            if (TextUtils.isEmpty(App.getInstance().getTicket()) && adBeans != null && adBeans.size() > 0) {
-                                mBanner.setVisibility(View.VISIBLE);
-                            } else {
-
-                            }
-                        }
-                    });
-        }
+//        if (adBeans.size() > 0 && TextUtils.isEmpty(App.getInstance().getTicket())) {
+//            for (AdBean adBean : adBeans) {
+//                images.add(adBean.getImgUrl());
+//            }
+//            mBanner.setImages(images);
+//            mBanner.start();
+//        }
+//
+//        if (disposable == null || disposable.isDisposed()) {
+//            disposable = Observable.interval(0, 20, TimeUnit.SECONDS)
+//                    .subscribeOn(Schedulers.io())
+//                    .observeOn(AndroidSchedulers.mainThread())
+//                    .subscribe(new Consumer<Long>() {
+//                        @Override
+//                        public void accept(Long aLong) throws Exception {
+//                            if (TextUtils.isEmpty(App.getInstance().getTicket()) && adBeans != null && adBeans.size() > 0) {
+//                                mBanner.setVisibility(View.VISIBLE);
+//                            } else {
+//
+//                            }
+//                        }
+//                    });
+//        }
     }
 
 

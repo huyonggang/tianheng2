@@ -548,7 +548,7 @@ public class OperateFragment extends BaseFragment<OperatePresenter> implements O
                         searchPackage(mExchangeBean.getEmptyBoxNumber());
                     }
                     //断开状态
-                case "01":
+                case "img1":
                     if ((status == 4 || status == 3) && Integer.parseInt(batteryFrame.device) == mExchangeBean.getEmptyBoxNumber()) {//  //检测成功或正在检测后拔出
                         status = 2;
                         sendCloseMessage();

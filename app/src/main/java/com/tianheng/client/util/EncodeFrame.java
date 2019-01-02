@@ -41,7 +41,7 @@ public class EncodeFrame {
         return selectByPageNo(deviceNo, "FF");
     }
 
-    //取电池 18 01 00 02 78 06 18 1E 06 46 00 01
+    //取电池 18 img1 00 02 78 06 18 1E 06 46 00 img1
     public static byte[] takeOut(int deviceNo) {
         StringBuilder builder = new StringBuilder();
         builder.append("1801");
@@ -50,7 +50,7 @@ public class EncodeFrame {
         return DataUtils.HexString2Bytes(builder.toString());
     }
 
-    //放电池 18 01 00 02 78 06 18 1E 08 44 00 01
+    //放电池 18 img1 00 02 78 06 18 1E 08 44 00 img1
     public static byte[] putIn(int deviceNo) {
         StringBuilder builder = new StringBuilder();
         builder.append("1801");
